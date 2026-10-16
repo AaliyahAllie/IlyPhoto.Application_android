@@ -18,6 +18,7 @@ import com.example.ilyphoto.data.Booking
 import com.example.ilyphoto.data.Photo
 import com.example.ilyphoto.data.ServiceLocator
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class GalleryFragment : Fragment(R.layout.fragment_gallery) {
@@ -26,19 +27,24 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
         val name: String,
         val subtitle: String,
         val heroTitle: String,
-        val heroBgRes: Int,
+        val heroBgRes: Int = R.drawable.bg_photo_portrait,
+        val heroImageUrl: String? = null,
         val item1Title: String,
         val item1Category: String,
-        val item1BgRes: Int,
+        val item1BgRes: Int = R.drawable.bg_photo_wedding,
+        val item1ImageUrl: String? = null,
         val item2Title: String,
         val item2Category: String,
-        val item2BgRes: Int,
+        val item2BgRes: Int = R.drawable.bg_photo_portrait,
+        val item2ImageUrl: String? = null,
         val item3Title: String,
         val item3Category: String,
-        val item3BgRes: Int,
+        val item3BgRes: Int = R.drawable.bg_photo_event,
+        val item3ImageUrl: String? = null,
         val item4Title: String,
         val item4Category: String,
-        val item4BgRes: Int,
+        val item4BgRes: Int = R.drawable.bg_photo_matric,
+        val item4ImageUrl: String? = null,
         val photoCount: Int = 5
     )
 
@@ -46,6 +52,7 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
     private var currentEventIndex = 0
     private var currentPreviewBgRes: Int = R.drawable.bg_photo_matric
     private var currentPreviewTitle: String = ""
+    private var currentPreviewUrl: String? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -70,29 +77,34 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
         val layoutGalleryContent = view.findViewById<View>(R.id.layoutGalleryContent)
         val btnEmptyGalleryBook = view.findViewById<View>(R.id.btnEmptyGalleryBook)
 
-        // Photo Cards
+        // Photo Cards & ImageViews
         val cardFeatured = view.findViewById<CardView>(R.id.cardFeaturedPhoto)
         val featuredBg = view.findViewById<FrameLayout>(R.id.featuredPhotoBg)
+        val ivFeatured = view.findViewById<ImageView>(R.id.ivFeatured)
         val tvFeaturedTitle = view.findViewById<TextView>(R.id.tvFeaturedTitle)
         val tvFeaturedCategory = view.findViewById<TextView>(R.id.tvFeaturedCategory)
 
         val cardItem1 = view.findViewById<CardView>(R.id.galleryItem1)
         val item1Bg = view.findViewById<FrameLayout>(R.id.photoItem1Bg)
+        val ivItem1 = view.findViewById<ImageView>(R.id.ivItem1)
         val tvItem1Title = view.findViewById<TextView>(R.id.tvItem1Title)
         val tvItem1Subtitle = view.findViewById<TextView>(R.id.tvItem1Subtitle)
 
         val cardItem2 = view.findViewById<CardView>(R.id.galleryItem2)
         val item2Bg = view.findViewById<FrameLayout>(R.id.photoItem2Bg)
+        val ivItem2 = view.findViewById<ImageView>(R.id.ivItem2)
         val tvItem2Title = view.findViewById<TextView>(R.id.tvItem2Title)
         val tvItem2Subtitle = view.findViewById<TextView>(R.id.tvItem2Subtitle)
 
         val cardItem3 = view.findViewById<CardView>(R.id.galleryItem3)
         val item3Bg = view.findViewById<FrameLayout>(R.id.photoItem3Bg)
+        val ivItem3 = view.findViewById<ImageView>(R.id.ivItem3)
         val tvItem3Title = view.findViewById<TextView>(R.id.tvItem3Title)
         val tvItem3Subtitle = view.findViewById<TextView>(R.id.tvItem3Subtitle)
 
         val cardItem4 = view.findViewById<CardView>(R.id.galleryItem4)
         val item4Bg = view.findViewById<FrameLayout>(R.id.photoItem4Bg)
+        val ivItem4 = view.findViewById<ImageView>(R.id.ivItem4)
         val tvItem4Title = view.findViewById<TextView>(R.id.tvItem4Title)
         val tvItem4Subtitle = view.findViewById<TextView>(R.id.tvItem4Subtitle)
 
@@ -101,6 +113,7 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
         val tvPreviewTitle = view.findViewById<TextView>(R.id.tvPreviewTitle)
         val tvPreviewCategory = view.findViewById<TextView>(R.id.tvPreviewCategory)
         val photoPreviewBackground = view.findViewById<FrameLayout>(R.id.photoPreviewBackground)
+        val ivPreviewPhoto = view.findViewById<ImageView>(R.id.ivPreviewPhoto)
         val btnPreviewDismiss = view.findViewById<ImageView>(R.id.btnPreviewDismiss)
         val btnClosePreview = view.findViewById<TextView>(R.id.btnClosePreviewDialog)
         val btnSaveSinglePhoto = view.findViewById<TextView>(R.id.btnDownloadSinglePhoto)
@@ -132,45 +145,122 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
 
             tvFeaturedTitle?.text = event.heroTitle
             tvFeaturedCategory?.text = "FEATURED • ${event.subtitle.uppercase()}"
-            featuredBg?.setBackgroundResource(event.heroBgRes)
+            if (!event.heroImageUrl.isNullOrBlank()) {
+                ivFeatured?.let { ImageLoader.load(it, event.heroImageUrl, event.heroBgRes) }
+            } else {
+                ivFeatured?.setImageResource(event.heroBgRes)
+            }
 
             tvItem1Title?.text = event.item1Title
             tvItem1Subtitle?.text = event.item1Category
-            item1Bg?.setBackgroundResource(event.item1BgRes)
+            if (!event.item1ImageUrl.isNullOrBlank()) {
+                ivItem1?.let { ImageLoader.load(it, event.item1ImageUrl, event.item1BgRes) }
+            } else {
+                ivItem1?.setImageResource(event.item1BgRes)
+            }
 
             tvItem2Title?.text = event.item2Title
             tvItem2Subtitle?.text = event.item2Category
-            item2Bg?.setBackgroundResource(event.item2BgRes)
+            if (!event.item2ImageUrl.isNullOrBlank()) {
+                ivItem2?.let { ImageLoader.load(it, event.item2ImageUrl, event.item2BgRes) }
+            } else {
+                ivItem2?.setImageResource(event.item2BgRes)
+            }
 
             tvItem3Title?.text = event.item3Title
             tvItem3Subtitle?.text = event.item3Category
-            item3Bg?.setBackgroundResource(event.item3BgRes)
+            if (!event.item3ImageUrl.isNullOrBlank()) {
+                ivItem3?.let { ImageLoader.load(it, event.item3ImageUrl, event.item3BgRes) }
+            } else {
+                ivItem3?.setImageResource(event.item3BgRes)
+            }
 
             tvItem4Title?.text = event.item4Title
             tvItem4Subtitle?.text = event.item4Category
-            item4Bg?.setBackgroundResource(event.item4BgRes)
+            if (!event.item4ImageUrl.isNullOrBlank()) {
+                ivItem4?.let { ImageLoader.load(it, event.item4ImageUrl, event.item4BgRes) }
+            } else {
+                ivItem4?.setImageResource(event.item4BgRes)
+            }
         }
 
-        fun showPreview(title: String, category: String, bgRes: Int) {
+        fun showPreview(title: String, category: String, bgRes: Int, imageUrl: String? = null) {
             currentPreviewBgRes = bgRes
             currentPreviewTitle = title
+            currentPreviewUrl = imageUrl
             tvPreviewTitle?.text = title
             tvPreviewCategory?.text = "$category • High Resolution (300 DPI)"
-            photoPreviewBackground?.setBackgroundResource(bgRes)
+            if (!imageUrl.isNullOrBlank() && ivPreviewPhoto != null) {
+                ImageLoader.load(ivPreviewPhoto, imageUrl, bgRes)
+            } else {
+                ivPreviewPhoto?.setImageResource(bgRes)
+            }
             previewOverlay?.visibility = View.VISIBLE
         }
 
-        // Build galleries from real user bookings & authenticated profile
+        // Live observation of real Azure Blob Storage photos & Bookings
         viewLifecycleOwner.lifecycleScope.launch {
-            ServiceLocator.bookings.bookings().collectLatest { allBookings ->
-                val currentProfile = ServiceLocator.auth.currentUserSnapshot()
+            combine(
+                ServiceLocator.auth.currentUser,
+                ServiceLocator.photos.photos(),
+                ServiceLocator.bookings.bookings()
+            ) { currentProfile, allPhotos, allBookings ->
+                Triple(currentProfile, allPhotos, allBookings)
+            }.collectLatest { (currentProfile, allPhotos, allBookings) ->
+                activeShowcases.clear()
+
+                // 1. First Priority: Actual Photos uploaded to Azure Blob Storage for this client (matches Website)
+                val clientPhotos = if (currentProfile != null) {
+                    allPhotos.filter {
+                        it.clientId.equals(currentProfile.clientId, ignoreCase = true) ||
+                        it.clientId.equals(currentProfile.uid, ignoreCase = true) ||
+                        (currentProfile.email.isNotBlank() && it.clientId.equals(currentProfile.email, ignoreCase = true))
+                    }
+                } else {
+                    emptyList()
+                }
+
+                if (clientPhotos.isNotEmpty()) {
+                    val p0 = clientPhotos[0]
+                    val p1 = clientPhotos.getOrNull(1) ?: p0
+                    val p2 = clientPhotos.getOrNull(2) ?: p0
+                    val p3 = clientPhotos.getOrNull(3) ?: p1
+                    val p4 = clientPhotos.getOrNull(4) ?: p0
+
+                    activeShowcases.add(
+                        GalleryItem(
+                            name = "${p0.title} (${clientPhotos.size} Photos)",
+                            subtitle = "Private Client Gallery",
+                            heroTitle = p0.title.ifBlank { "Client Gallery" },
+                            heroBgRes = R.drawable.bg_photo_portrait,
+                            heroImageUrl = p0.imageUrl,
+                            item1Title = p1.title.ifBlank { "Photo 2" },
+                            item1Category = "High Resolution",
+                            item1BgRes = R.drawable.bg_photo_wedding,
+                            item1ImageUrl = p1.imageUrl,
+                            item2Title = p2.title.ifBlank { "Photo 3" },
+                            item2Category = "High Resolution",
+                            item2BgRes = R.drawable.bg_photo_matric,
+                            item2ImageUrl = p2.imageUrl,
+                            item3Title = p3.title.ifBlank { "Photo 4" },
+                            item3Category = "High Resolution",
+                            item3BgRes = R.drawable.bg_photo_event,
+                            item3ImageUrl = p3.imageUrl,
+                            item4Title = p4.title.ifBlank { "Photo 5" },
+                            item4Category = "High Resolution",
+                            item4BgRes = R.drawable.bg_photo_portrait,
+                            item4ImageUrl = p4.imageUrl,
+                            photoCount = clientPhotos.size
+                        )
+                    )
+                }
+
+                // 2. Also include scheduled booking showcases for complete portfolio access
                 val userBookings = if (currentProfile != null) {
                     allBookings.filter { currentProfile.matchesBooking(it) }
                 } else {
                     emptyList()
                 }
-
-                activeShowcases.clear()
 
                 for (booking in userBookings) {
                     val serviceLower = booking.serviceName.lowercase()
@@ -269,39 +359,39 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
             findNavController().navigate(R.id.action_global_to_bookingFragment)
         }
 
-        // Photo card click listeners to launch full-screen preview
+        // Photo card click listeners to launch full-screen preview with real Azure Blob image
         cardFeatured?.setOnClickListener {
             if (activeShowcases.isNotEmpty()) {
                 val event = activeShowcases[currentEventIndex]
-                showPreview(event.heroTitle, event.subtitle, event.heroBgRes)
+                showPreview(event.heroTitle, event.subtitle, event.heroBgRes, event.heroImageUrl)
             }
         }
 
         cardItem1?.setOnClickListener {
             if (activeShowcases.isNotEmpty()) {
                 val event = activeShowcases[currentEventIndex]
-                showPreview(event.item1Title, event.item1Category, event.item1BgRes)
+                showPreview(event.item1Title, event.item1Category, event.item1BgRes, event.item1ImageUrl)
             }
         }
 
         cardItem2?.setOnClickListener {
             if (activeShowcases.isNotEmpty()) {
                 val event = activeShowcases[currentEventIndex]
-                showPreview(event.item2Title, event.item2Category, event.item2BgRes)
+                showPreview(event.item2Title, event.item2Category, event.item2BgRes, event.item2ImageUrl)
             }
         }
 
         cardItem3?.setOnClickListener {
             if (activeShowcases.isNotEmpty()) {
                 val event = activeShowcases[currentEventIndex]
-                showPreview(event.item3Title, event.item3Category, event.item3BgRes)
+                showPreview(event.item3Title, event.item3Category, event.item3BgRes, event.item3ImageUrl)
             }
         }
 
         cardItem4?.setOnClickListener {
             if (activeShowcases.isNotEmpty()) {
                 val event = activeShowcases[currentEventIndex]
-                showPreview(event.item4Title, event.item4Category, event.item4BgRes)
+                showPreview(event.item4Title, event.item4Category, event.item4BgRes, event.item4ImageUrl)
             }
         }
 
@@ -313,7 +403,7 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
             previewOverlay?.visibility = View.GONE
         }
 
-        // REAL PHOTO SAVE TO DEVICE GALLERY
+        // Save photo to device
         btnSaveSinglePhoto?.setOnClickListener {
             val uri = GalleryStorageHelper.saveDrawableToGallery(
                 requireContext(),
@@ -337,7 +427,7 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
             previewOverlay?.visibility = View.GONE
         }
 
-        // REAL FULL GALLERY DOWNLOAD TO DEVICE STORAGE
+        // Download gallery to device storage
         btnDownload?.setOnClickListener {
             if (activeShowcases.isEmpty()) return@setOnClickListener
             val event = activeShowcases[currentEventIndex]
