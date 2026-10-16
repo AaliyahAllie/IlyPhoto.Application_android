@@ -22,6 +22,11 @@ object ImageLoader {
         }
     }
 
+    fun getBitmap(url: String?): Bitmap? {
+        if (url.isNullOrBlank()) return null
+        return memoryCache.get(url)
+    }
+
     fun load(imageView: ImageView, url: String?, fallbackRes: Int = R.drawable.ic_image_placeholder) {
         if (url.isNullOrBlank()) {
             imageView.setImageResource(fallbackRes)

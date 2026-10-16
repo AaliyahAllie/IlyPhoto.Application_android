@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Image Frame -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:background="#E6E1D8">
+
+            <ImageView
+                android:id="@+id/ivGalleryCardImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_image_placeholder"
+                android:contentDescription="Gallery Photo" />
+
+            <TextView
+                android:id="@+id/tvGalleryCardBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="12dp"
+                android:background="#B31A1A1A"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:text="📁 AZURE CLOUD"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <!-- Details Container matching Website Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvGalleryCardCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HIGH RESOLUTION PHOTO"
+                android:textColor="#7A6B5D"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
+
+            <TextView
+                android:id="@+id/tvGalleryCardTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Photo Title"
+                android:textColor="#1A1A1A"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvGalleryCardDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Professionally color-graded photo from your client collection."
+                android:textColor="#666666"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp" />
+
+            <!-- Action buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:orientation="horizontal"
+                android:layout_marginTop="14dp">
+
+                <TextView
+                    android:id="@+id/btnCardView"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/login_button_background"
+                    android:gravity="center"
+                    android:text="👁️ VIEW PHOTO"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/btnCardSave"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/input_grey_background"
+                    android:gravity="center"
+                    android:text="⬇️ SAVE TO PHONE"
+                    android:textColor="#1A1A1A"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="10dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

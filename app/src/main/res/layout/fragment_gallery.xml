@@ -100,7 +100,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/gallerySectionLabel" />
 
-    <!-- Dropdown Selector "EVENT NAME" -->
+    <!-- Filter / Dropdown: My Albums / All Photos -->
     <LinearLayout
         android:id="@+id/btnEventNameDropdown"
         android:layout_width="wrap_content"
@@ -122,7 +122,7 @@
             android:id="@+id/tvSelectedEventName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Matric Ball 2026"
+            android:text="My Client Albums"
             android:textColor="@color/brand_text_dark"
             android:textSize="14sp"
             android:fontFamily="sans-serif-medium"
@@ -132,11 +132,11 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_arrow_drop_down"
-            android:contentDescription="Select Event"
+            android:contentDescription="Select Gallery Filter"
             android:layout_marginStart="8dp" />
     </LinearLayout>
 
-    <!-- Scrollable container for photo cards -->
+    <!-- Scrollable container for dynamic Azure Blob Storage photo cards -->
     <ScrollView
         android:id="@+id/scrollGallery"
         android:layout_width="0dp"
@@ -157,7 +157,7 @@
             android:paddingEnd="20dp"
             android:paddingBottom="16dp">
 
-            <!-- Clean Empty State Card -->
+            <!-- Clean Empty State Card matching Website -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cardEmptyGallery"
                 android:layout_width="match_parent"
@@ -170,38 +170,38 @@
                 android:paddingBottom="32dp"
                 android:visibility="gone">
 
-                <ImageView
-                    android:id="@+id/ivEmptyGalleryIcon"
-                    android:layout_width="54dp"
-                    android:layout_height="54dp"
-                    android:src="@drawable/ic_search"
-                    app:tint="@color/brand_lilac"
+                <TextView
+                    android:id="@+id/tvEmptyCameraEmoji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📷"
+                    android:textSize="48sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:contentDescription="@string/no_gallery_photos" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tvEmptyGalleryTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/no_gallery_photos"
+                    android:text="No Galleries Uploaded Yet"
                     android:textColor="@color/brand_text_dark"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     android:layout_marginTop="14dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/ivEmptyGalleryIcon" />
+                    app:layout_constraintTop_toBottomOf="@id/tvEmptyCameraEmoji" />
 
                 <TextView
                     android:id="@+id/tvEmptyGalleryDesc"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/gallery_in_progress"
+                    android:text="Once your photography session has taken place and your pictures are professionally edited, Aysha will upload your gallery right here for you to view and download!"
                     android:textColor="@color/brand_text_muted"
                     android:textSize="13sp"
                     android:gravity="center"
+                    android:lineSpacingExtra="3dp"
                     android:layout_marginTop="8dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -230,306 +230,13 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- Container for photo cards -->
+            <!-- Dynamic container for real Azure Blob Storage photos -->
             <LinearLayout
                 android:id="@+id/layoutGalleryContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical" />
 
-            <!-- Featured Highlight Card (Hero Photo) -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardFeaturedPhoto"
-                android:layout_width="match_parent"
-                android:layout_height="140dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:layout_marginBottom="14dp">
-
-                <FrameLayout
-                    android:id="@+id/featuredPhotoBg"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/bg_photo_matric">
-
-                    <ImageView
-                        android:id="@+id/ivFeatured"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:contentDescription="Featured Photo" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="bottom"
-                        android:padding="16dp"
-                        android:background="#40000000">
-
-                        <TextView
-                            android:id="@+id/tvFeaturedCategory"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="FEATURED PORTFOLIO"
-                            android:textColor="#FFD54F"
-                            android:textSize="10sp"
-                            android:textStyle="bold"
-                            android:letterSpacing="0.05" />
-
-                        <TextView
-                            android:id="@+id/tvFeaturedTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Matric Dance Golden Hour • Cape Town"
-                            android:textColor="@color/white"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="2dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tap to preview high-definition image"
-                            android:textColor="#E0E0E0"
-                            android:textSize="11sp"
-                            android:layout_marginTop="2dp" />
-                    </LinearLayout>
-                </FrameLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- 2-Column Photo Thumbnails Grid (Row 1) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2"
-                android:layout_marginBottom="14dp">
-
-                <!-- Photo Item 1 -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/galleryItem1"
-                    android:layout_width="0dp"
-                    android:layout_height="125dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="3dp"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <FrameLayout
-                        android:id="@+id/photoItem1Bg"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/bg_photo_wedding">
-
-                        <ImageView
-                            android:id="@+id/ivItem1"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:contentDescription="Photo 1" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:gravity="bottom"
-                            android:padding="10dp"
-                            android:background="#35000000">
-
-                            <TextView
-                                android:id="@+id/tvItem1Title"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Coastline Sunset"
-                                android:textColor="@color/white"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvItem1Subtitle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Weddings"
-                                android:textColor="#B0BEC5"
-                                android:textSize="10sp" />
-                        </LinearLayout>
-                    </FrameLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- Photo Item 2 -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/galleryItem2"
-                    android:layout_width="0dp"
-                    android:layout_height="125dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="6dp"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="3dp"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <FrameLayout
-                        android:id="@+id/photoItem2Bg"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/bg_photo_portrait">
-
-                        <ImageView
-                            android:id="@+id/ivItem2"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:contentDescription="Photo 2" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:gravity="bottom"
-                            android:padding="10dp"
-                            android:background="#35000000">
-
-                            <TextView
-                                android:id="@+id/tvItem2Title"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Studio Lighting"
-                                android:textColor="@color/white"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvItem2Subtitle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Portraits"
-                                android:textColor="#B0BEC5"
-                                android:textSize="10sp" />
-                        </LinearLayout>
-                    </FrameLayout>
-                </androidx.cardview.widget.CardView>
-            </LinearLayout>
-
-            <!-- 2-Column Photo Thumbnails Grid (Row 2) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2">
-
-                <!-- Photo Item 3 -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/galleryItem3"
-                    android:layout_width="0dp"
-                    android:layout_height="125dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="3dp"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <FrameLayout
-                        android:id="@+id/photoItem3Bg"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/bg_photo_event">
-
-                        <ImageView
-                            android:id="@+id/ivItem3"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:contentDescription="Photo 3" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:gravity="bottom"
-                            android:padding="10dp"
-                            android:background="#35000000">
-
-                            <TextView
-                                android:id="@+id/tvItem3Title"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Garden Ceremony"
-                                android:textColor="@color/white"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvItem3Subtitle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Events"
-                                android:textColor="#B0BEC5"
-                                android:textSize="10sp" />
-                        </LinearLayout>
-                    </FrameLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- Photo Item 4 -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/galleryItem4"
-                    android:layout_width="0dp"
-                    android:layout_height="125dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="6dp"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="3dp"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <FrameLayout
-                        android:id="@+id/photoItem4Bg"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/bg_photo_matric">
-
-                        <ImageView
-                            android:id="@+id/ivItem4"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:contentDescription="Photo 4" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:gravity="bottom"
-                            android:padding="10dp"
-                            android:background="#35000000">
-
-                            <TextView
-                                android:id="@+id/tvItem4Title"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Evening Ball Dress"
-                                android:textColor="@color/white"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvItem4Subtitle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Matric Ball"
-                                android:textColor="#B0BEC5"
-                                android:textSize="10sp" />
-                        </LinearLayout>
-                    </FrameLayout>
-                </androidx.cardview.widget.CardView>
-            </LinearLayout>
-
-            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
