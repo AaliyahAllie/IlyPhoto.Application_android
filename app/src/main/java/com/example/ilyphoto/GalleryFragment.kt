@@ -1,7 +1,5 @@
 package com.example.ilyphoto
 
-import android.content.Context
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +8,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -22,9 +19,7 @@ import kotlinx.coroutines.launch
 
 class GalleryFragment : Fragment(R.layout.fragment_gallery) {
 
-    private var isStudioPortfolioMode = false
-    private var allRemotePhotos: List<Photo> = emptyList()
-    private var displayedPhotos: List<Photo> = emptyList()
+    private var clientPhotos: List<Photo> = emptyList()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -54,7 +49,6 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
             }
         }
 
-        val btnEventDropdown = view.findViewById<LinearLayout>(R.id.btnEventNameDropdown)
         val tvSelectedEvent = view.findViewById<TextView>(R.id.tvSelectedEventName)
         val cardEmptyGallery = view.findViewById<View>(R.id.cardEmptyGallery)
         val btnEmptyGalleryBook = view.findViewById<View>(R.id.btnEmptyGalleryBook)
@@ -107,97 +101,103 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
             findNavController().navigate(R.id.action_global_to_bookingFragment)
         }
 
-        fun renderGallery() {
-            val currentProfile = ServiceLocator.auth.currentUserSnapshot()
-            val photosToDisplay = if (isStudioPortfolioMode) {
-                allRemotePhotos
-            } else {
-                if (currentProfile != null) {
-                    val clientKey = currentProfile.clientId.ifBlank { currentProfile.uid }
-                    allRemotePhotos.filter {
-                        it.clientId.equals(clientKey, ignoreCase = true) ||
-                        (currentProfile.clientId.isNotBlank() && it.clientId.contains(currentProfile.clientId, ignoreCase = true)) ||
-                        it.clientId.equals(currentProfile.uid, ignoreCase = true) ||
-                        (currentProfile.email.isNotBlank() && it.clientId.equals(currentProfile.email, ignoreCase = true))
-                    }
-                } else {
-                    allRemotePhotos
+        // Live observation of Azure Blob photos & client profile
+        // Strictly filters photos linked ONLY to this authenticated client's account
+        viewLifecycleOwner.lifecycleScope.launch {
+            combine(
+                ServiceLocator.auth.currentUser,
+                ServiceLocator.photos.photos(),
+                ServiceLocator.bookings.bookings()
+            ) { currentProfile, allPhotos, allBookings ->
+                Triple(currentProfile, allPhotos, allBookings)
+            }.collectLatest { (currentProfile, allPhotos, allBookings) ->
+                layoutGalleryContent?.removeAllViews()
+
+                if (currentProfile == null) {
+                    cardEmptyGallery?.visibility = View.VISIBLE
+                    btnDownloadGallery?.visibility = View.GONE
+                    return@collectLatest
                 }
-            }
 
-            displayedPhotos = photosToDisplay
-            layoutGalleryContent?.removeAllViews()
+                // If profile clientId is missing, resolve it from the user's bookings
+                val resolvedClientId = if (currentProfile.clientId.isNotBlank()) {
+                    currentProfile.clientId
+                } else {
+                    allBookings.firstOrNull { currentProfile.matchesBooking(it) }?.clientId.orEmpty()
+                }
 
-            if (photosToDisplay.isEmpty()) {
-                cardEmptyGallery?.visibility = View.VISIBLE
-                btnDownloadGallery?.visibility = View.GONE
-            } else {
-                cardEmptyGallery?.visibility = View.GONE
-                btnDownloadGallery?.visibility = View.VISIBLE
-                btnDownloadGallery?.text = "DOWNLOAD ALL (${photosToDisplay.size} PHOTOS)"
+                val activeProfile = if (resolvedClientId.isNotBlank() && currentProfile.clientId.isBlank()) {
+                    currentProfile.copy(clientId = resolvedClientId)
+                } else {
+                    currentProfile
+                }
 
-                val inflater = LayoutInflater.from(requireContext())
-                for (photo in photosToDisplay) {
-                    val cardView = inflater.inflate(R.layout.item_gallery_photo_card, layoutGalleryContent, false)
+                // Strictly filter photos belonging ONLY to this client's account
+                val userPhotos = allPhotos.filter { photo ->
+                    activeProfile.matchesPhoto(photo)
+                }
 
-                    val ivImage = cardView.findViewById<ImageView>(R.id.ivGalleryCardImage)
-                    val tvBadge = cardView.findViewById<TextView>(R.id.tvGalleryCardBadge)
-                    val tvCategory = cardView.findViewById<TextView>(R.id.tvGalleryCardCategory)
-                    val tvTitle = cardView.findViewById<TextView>(R.id.tvGalleryCardTitle)
-                    val tvDesc = cardView.findViewById<TextView>(R.id.tvGalleryCardDesc)
-                    val btnView = cardView.findViewById<TextView>(R.id.btnCardView)
-                    val btnSave = cardView.findViewById<TextView>(R.id.btnCardSave)
+                clientPhotos = userPhotos
 
-                    tvTitle.text = photo.title.ifBlank { "Photoshoot Picture" }
-                    tvCategory.text = if (photo.category.isNotBlank()) photo.category.uppercase() else "AZURE BLOB STORAGE"
-                    tvDesc.text = photo.description.ifBlank { "Professionally edited, high-resolution photo." }
-                    tvBadge.text = "📁 HD QUALITY"
+                if (userPhotos.isEmpty()) {
+                    cardEmptyGallery?.visibility = View.VISIBLE
+                    btnDownloadGallery?.visibility = View.GONE
+                    tvSelectedEvent?.text = "My Private Albums (0 Photos)"
+                } else {
+                    cardEmptyGallery?.visibility = View.GONE
+                    btnDownloadGallery?.visibility = View.VISIBLE
+                    btnDownloadGallery?.text = "DOWNLOAD ALL (${userPhotos.size} PHOTOS)"
+                    tvSelectedEvent?.text = "My Private Albums (${userPhotos.size} Photos)"
 
-                    // Load real Azure Blob SAS URL into the ImageView
-                    ImageLoader.load(ivImage, photo.imageUrl, R.drawable.bg_photo_matric)
+                    val inflater = LayoutInflater.from(requireContext())
+                    for (photo in userPhotos) {
+                        val cardView = inflater.inflate(R.layout.item_gallery_photo_card, layoutGalleryContent, false)
 
-                    val openPreviewListener = View.OnClickListener { showPreview(photo) }
-                    cardView.setOnClickListener(openPreviewListener)
-                    ivImage.setOnClickListener(openPreviewListener)
-                    btnView.setOnClickListener(openPreviewListener)
+                        val ivImage = cardView.findViewById<ImageView>(R.id.ivGalleryCardImage)
+                        val tvBadge = cardView.findViewById<TextView>(R.id.tvGalleryCardBadge)
+                        val tvCategory = cardView.findViewById<TextView>(R.id.tvGalleryCardCategory)
+                        val tvTitle = cardView.findViewById<TextView>(R.id.tvGalleryCardTitle)
+                        val tvDesc = cardView.findViewById<TextView>(R.id.tvGalleryCardDesc)
+                        val btnView = cardView.findViewById<TextView>(R.id.btnCardView)
+                        val btnSave = cardView.findViewById<TextView>(R.id.btnCardSave)
 
-                    btnSave.setOnClickListener {
-                        val drawable = ivImage.drawable
-                        if (drawable != null) {
-                            val bitmap = GalleryStorageHelper.drawableToBitmap(drawable)
-                            val uri = GalleryStorageHelper.saveBitmapToGallery(requireContext(), bitmap, photo.title.ifBlank { "photo" })
-                            if (uri != null) {
-                                Toast.makeText(requireContext(), "Saved to Pictures/IlyPhoto ✓", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Toast.makeText(requireContext(), "Saved photo to device storage.", Toast.LENGTH_SHORT).show()
+                        tvTitle.text = photo.title.ifBlank { "Photoshoot Picture" }
+                        tvCategory.text = "PRIVATE ALBUM • HIGH RESOLUTION"
+                        tvDesc.text = photo.description.ifBlank { "Professionally edited, high-resolution photo." }
+                        tvBadge.text = "📁 HD QUALITY"
+
+                        // Load real Azure Blob SAS URL into the ImageView
+                        ImageLoader.load(ivImage, photo.imageUrl, R.drawable.bg_photo_matric)
+
+                        val openPreviewListener = View.OnClickListener { showPreview(photo) }
+                        cardView.setOnClickListener(openPreviewListener)
+                        ivImage.setOnClickListener(openPreviewListener)
+                        btnView.setOnClickListener(openPreviewListener)
+
+                        btnSave.setOnClickListener {
+                            val drawable = ivImage.drawable
+                            if (drawable != null) {
+                                val bitmap = GalleryStorageHelper.drawableToBitmap(drawable)
+                                val uri = GalleryStorageHelper.saveBitmapToGallery(requireContext(), bitmap, photo.title.ifBlank { "photo" })
+                                if (uri != null) {
+                                    Toast.makeText(requireContext(), "Saved to Pictures/IlyPhoto ✓", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(requireContext(), "Saved photo to device storage.", Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
-                    }
 
-                    layoutGalleryContent?.addView(cardView)
+                        layoutGalleryContent?.addView(cardView)
+                    }
                 }
             }
         }
 
-        // Toggle filter dialog: My Client Albums vs Studio Showcase
-        btnEventDropdown?.setOnClickListener {
-            val options = arrayOf("My Client Albums (Private)", "Studio Portfolio Showcase (All)")
-            AlertDialog.Builder(requireContext())
-                .setTitle("Select Gallery View")
-                .setItems(options) { _, which ->
-                    isStudioPortfolioMode = (which == 1)
-                    tvSelectedEvent?.text = if (isStudioPortfolioMode) "Studio Portfolio" else "My Client Albums"
-                    renderGallery()
-                }
-                .show()
-        }
-
-        // Download all photos in currently active list
+        // Download all photos in currently active client list
         btnDownloadGallery?.setOnClickListener {
-            if (displayedPhotos.isEmpty()) return@setOnClickListener
+            if (clientPhotos.isEmpty()) return@setOnClickListener
             var saved = 0
-            for (photo in displayedPhotos) {
-                // If loaded in memory cache or fallback, save to gallery
+            for (photo in clientPhotos) {
                 val cached = ImageLoader.getBitmap(photo.imageUrl)
                 if (cached != null) {
                     GalleryStorageHelper.saveBitmapToGallery(requireContext(), cached, photo.title)
@@ -212,20 +212,7 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
                 )
                 Toast.makeText(requireContext(), "Downloaded $saved photos to Pictures/IlyPhoto ✓", Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(requireContext(), "Saving ${displayedPhotos.size} photos to device...", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        // Observe Azure Blob Storage photos and current profile
-        viewLifecycleOwner.lifecycleScope.launch {
-            combine(
-                ServiceLocator.auth.currentUser,
-                ServiceLocator.photos.photos()
-            ) { profile, photos ->
-                Pair(profile, photos)
-            }.collectLatest { (profile, photos) ->
-                allRemotePhotos = photos
-                renderGallery()
+                Toast.makeText(requireContext(), "Saving ${clientPhotos.size} photos to device...", Toast.LENGTH_SHORT).show()
             }
         }
     }

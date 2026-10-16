@@ -100,20 +100,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/gallerySectionLabel" />
 
-    <!-- Filter / Dropdown: My Albums / All Photos -->
+    <!-- Header Pill: My Client Albums -->
     <LinearLayout
         android:id="@+id/btnEventNameDropdown"
         android:layout_width="wrap_content"
-        android:layout_height="42dp"
+        android:layout_height="40dp"
         android:background="@drawable/dropdown_pill_background"
         android:elevation="3dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingStart="20dp"
-        android:paddingEnd="16dp"
+        android:paddingStart="22dp"
+        android:paddingEnd="22dp"
         android:layout_marginTop="14dp"
-        android:clickable="true"
-        android:focusable="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dividerGalleryBottom">
@@ -122,18 +120,12 @@
             android:id="@+id/tvSelectedEventName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="My Client Albums"
+            android:text="My Private Albums"
             android:textColor="@color/brand_text_dark"
             android:textSize="14sp"
+            android:textStyle="bold"
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.03" />
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_arrow_drop_down"
-            android:contentDescription="Select Gallery Filter"
-            android:layout_marginStart="8dp" />
     </LinearLayout>
 
     <!-- Scrollable container for dynamic Azure Blob Storage photo cards -->

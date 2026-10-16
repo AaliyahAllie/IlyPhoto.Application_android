@@ -44,6 +44,16 @@ data class UserProfile(
         return false
     }
 
+    fun matchesPhoto(photo: Photo): Boolean {
+        if (role == UserRole.PHOTOGRAPHER) return true
+        val pCid = photo.clientId.trim()
+        val pPath = photo.storagePath.trim()
+        if (clientId.isNotBlank() && (pCid.equals(clientId, ignoreCase = true) || pPath.contains("/$clientId/", ignoreCase = true))) return true
+        if (uid.isNotBlank() && (pCid.equals(uid, ignoreCase = true) || pPath.contains("/$uid/", ignoreCase = true))) return true
+        if (email.isNotBlank() && (pCid.equals(email, ignoreCase = true) || photo.title.contains(email, ignoreCase = true))) return true
+        return false
+    }
+
     fun toJson(): JSONObject = JSONObject().apply {
         put("uid", uid)
         put("clientId", clientId)

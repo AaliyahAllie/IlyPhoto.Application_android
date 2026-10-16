@@ -118,7 +118,17 @@ object AzureApiClient {
             put("email", email)
             put("password", password)
         }
-        val response = executeRequest("POST", "/auth/login", body, requiresAuth = false)
+        val response = try {
+            executeRequest("POST", "/auth/login", body, requiresAuth = false)
+        } catch (e: AzureApiException) {
+            if (e.statusCode == 400) {
+                val encodedEmail = java.net.URLEncoder.encode(email, "UTF-8")
+                val encodedPass = java.net.URLEncoder.encode(password, "UTF-8")
+                executeRequest("GET", "/auth/login?email=$encodedEmail&password=$encodedPass", requiresAuth = false)
+            } else {
+                throw e
+            }
+        }
         val json = JSONObject(response)
         val token = json.optString("token")
         val userJson = json.getJSONObject("user")
