@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#40000000">
+
+    <!-- Outside Click to Dismiss Area (Left side) -->
+    <View
+        android:id="@+id/menuOutsideScrim"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:background="#50000000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/menuPanel"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Navigation Drawer Panel (Right 290dp) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/menuPanel"
+        android:layout_width="290dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/menu_panel_background"
+        android:elevation="16dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="36dp"
+        android:paddingBottom="36dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Title: "Navigation" -->
+        <TextView
+            android:id="@+id/tvNavHeading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/navigation"
+            android:textColor="@color/brand_menu_text"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp" />
+
+        <!-- Divider line under "Navigation" -->
+        <View
+            android:id="@+id/dividerNav"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/brand_divider"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvNavHeading" />
+
+        <!-- Navigation Menu Items List -->
+        <LinearLayout
+            android:id="@+id/navItemsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="18dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dividerNav">
+
+            <!-- Profile Item -->
+            <TextView
+                android:id="@+id/menuItemProfile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/profile"
+                android:textColor="@color/brand_menu_text"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground" />
+
+            <!-- Settings Item -->
+            <TextView
+                android:id="@+id/menuItemSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings"
+                android:textColor="@color/brand_menu_text"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground" />
+
+            <!-- Home Screen Item -->
+            <TextView
+                android:id="@+id/menuItemHome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/home_screen"
+                android:textColor="@color/brand_menu_text"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground" />
+
+            <!-- Gallery Item -->
+            <TextView
+                android:id="@+id/menuItemGallery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/gallery"
+                android:textColor="@color/brand_menu_text"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground" />
+
+            <!-- Bookings Item -->
+            <TextView
+                android:id="@+id/menuItemBookings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/bookings_menu"
+                android:textColor="@color/brand_menu_text"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground" />
+
+            <!-- Invoices Item -->
+            <TextView
+                android:id="@+id/menuItemInvoices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/invoices_menu"
+                android:textColor="@color/brand_menu_text"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground" />
+
+            <!-- Packages Item -->
+            <TextView
+                android:id="@+id/menuItemPackages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/packages"
+                android:textColor="@color/brand_menu_text"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground" />
+
+        </LinearLayout>
+
+        <!-- "Log Out" Red Pill Button -->
+        <TextView
+            android:id="@+id/btnMenuLogOut"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/button_red_background"
+            android:elevation="4dp"
+            android:gravity="center"
+            android:text="@string/log_out"
+            android:textColor="@color/white"
+            android:textSize="19sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.03"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

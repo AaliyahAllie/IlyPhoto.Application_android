@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/splashFragment">
+
+    <!-- Global Navigation Actions -->
+    <action
+        android:id="@+id/action_global_to_homeFragment"
+        app:destination="@id/homeFragment" />
+
+    <action
+        android:id="@+id/action_global_to_profileFragment"
+        app:destination="@id/profileFragment" />
+
+    <action
+        android:id="@+id/action_global_to_galleryFragment"
+        app:destination="@id/galleryFragment" />
+
+    <action
+        android:id="@+id/action_global_to_myBookingFragment"
+        app:destination="@id/myBookingFragment" />
+
+    <action
+        android:id="@+id/action_global_to_packagesFragment"
+        app:destination="@id/packagesFragment" />
+
+    <action
+        android:id="@+id/action_global_to_bookingFragment"
+        app:destination="@id/bookingFragment" />
+
+    <action
+        android:id="@+id/action_global_to_loginFragment"
+        app:destination="@id/loginFragment"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/action_global_to_settingsFragment"
+        app:destination="@id/settingsFragment" />
+
+    <action
+        android:id="@+id/action_global_to_invoiceFragment"
+        app:destination="@id/invoiceFragment" />
+
+    <!-- Splash Screen -->
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.example.ilyphoto.SplashFragment"
+        android:label="Splash"
+        tools:layout="@layout/fragment_splash">
+        <action
+            android:id="@+id/action_splashFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Login Screen -->
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.ilyphoto.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+    </fragment>
+
+    <!-- Register Screen -->
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.ilyphoto.RegisterFragment"
+        android:label="Register"
+        tools:layout="@layout/fragment_register">
+        <action
+            android:id="@+id/action_registerFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_registerFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Home Screen -->
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.ilyphoto.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_myBookingFragment"
+            app:destination="@id/myBookingFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_packagesFragment"
+            app:destination="@id/packagesFragment" />
+    </fragment>
+
+    <!-- Packages Screen -->
+    <fragment
+        android:id="@+id/packagesFragment"
+        android:name="com.example.ilyphoto.PackagesFragment"
+        android:label="Packages"
+        tools:layout="@layout/fragment_packages">
+        <action
+            android:id="@+id/action_packagesFragment_to_bookingFragment"
+            app:destination="@id/bookingFragment" />
+        <action
+            android:id="@+id/action_packagesFragment_to_myBookingFragment"
+            app:destination="@id/myBookingFragment" />
+    </fragment>
+
+    <!-- Booking Screen -->
+    <fragment
+        android:id="@+id/bookingFragment"
+        android:name="com.example.ilyphoto.BookingFragment"
+        android:label="Booking"
+        tools:layout="@layout/fragment_booking">
+        <argument
+            android:name="bookingId"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_bookingFragment_to_myBookingFragment"
+            app:destination="@id/myBookingFragment" />
+    </fragment>
+
+    <!-- My Booking Screen -->
+    <fragment
+        android:id="@+id/myBookingFragment"
+        android:name="com.example.ilyphoto.MyBookingFragment"
+        android:label="My Booking"
+        tools:layout="@layout/fragment_my_booking">
+        <action
+            android:id="@+id/action_myBookingFragment_to_bookingFragment"
+            app:destination="@id/bookingFragment" />
+    </fragment>
+
+    <!-- Gallery Screen -->
+    <fragment
+        android:id="@+id/galleryFragment"
+        android:name="com.example.ilyphoto.GalleryFragment"
+        android:label="Gallery"
+        tools:layout="@layout/fragment_gallery" />
+
+    <!-- Profile Screen -->
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.ilyphoto.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <!-- Settings Screen -->
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.ilyphoto.SettingsFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings" />
+
+    <!-- Invoice Screen -->
+    <fragment
+        android:id="@+id/invoiceFragment"
+        android:name="com.example.ilyphoto.InvoiceFragment"
+        android:label="Invoice"
+        tools:layout="@layout/fragment_invoice" />
+
+</navigation>

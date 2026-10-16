@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">IlyPhoto</string>
+    <string name="home">IKHAYA</string>
+    <string name="ily_photo_title">ILY PHOTO.</string>
+    <string name="capturing_every_moment">UKUBAMBA WONKE UMZUZU</string>
+    <string name="upcoming_event">UMSITHO OZAYO</string>
+    <string name="sample_booking">UKUBHUKISHA: 04 SEPTEMBER</string>
+    <string name="more">NGAPHEZULU</string>
+    <string name="view_bookings">BONA IZIBHUKISHO</string>
+    <string name="search">Khangela</string>
+    <string name="settings">Izicwangciso</string>
+    <string name="menu">Imenyu</string>
+
+    <!-- Profile -->
+    <string name="profile">Iprofayili</string>
+    <string name="first_name">Igama</string>
+    <string name="last_name">Ifani</string>
+    <string name="email_address">Idilesi ye-imeyile</string>
+    <string name="contact_details">Iinkcukacha zoQhagamshelwano</string>
+    <string name="log_out">Phuma</string>
+
+    <!-- Packages -->
+    <string name="packages">IIPHAKHEJI</string>
+    <string name="matric_balls">IBHOLA YEMATHRIKI</string>
+    <string name="matric_balls_price">R400 NGEEYURE EZI-2</string>
+    <string name="weddings">IMITSHATO</string>
+    <string name="weddings_price">UKUSUSELA KU-R1200 NGEEYURE EZI-6</string>
+    <string name="events">IMISITHO</string>
+    <string name="events_price">R400 NGEEYURE EZI-2</string>
+    <string name="book">BHUKISHA</string>
+
+    <!-- Booking -->
+    <string name="booking">UKUBHUKISHA</string>
+    <string name="select_a_date">Khetha umhla</string>
+    <string name="make_booking">Yenza uBhukisho</string>
+    <string name="conflict_oops">YEHA!</string>
+    <string name="conflict_message">KUBONAKALA UKUBA KUKHO UMSITHO OSELE UBHUKISHIWEYO.\nNCEDA KHETHA WUMBI UMHLA</string>
+    <string name="close">VALA</string>
+
+    <!-- My Booking -->
+    <string name="my_booking">IZIBHUKISHO ZAM</string>
+    <string name="details">IINKCUKACHA</string>
+    <string name="event_type_label">UHLOBO LWEMSITHO:</string>
+    <string name="location_label">INDAWO:</string>
+    <string name="price_label">IXABISO:</string>
+    <string name="payment_details_label">IINKCUKACHA ZENTLAWULO:</string>
+    <string name="edit">HLELA</string>
+    <string name="make_a_booking">YENZA UBHUKISHO</string>
+    <string name="no_upcoming_bookings">AZIKHO IZIBHUKISHO EZIZAYO</string>
+    <string name="no_upcoming_bookings_desc">Okwangoku awunazo iiseshoni zeefoto ezicwangcisiweyo. Cofa u-\'YENZA UBHUKISHO\' ngezantsi ukugcina umhla wakho kunye ne-ILY PHOTO!</string>
+
+    <!-- Gallery -->
+    <string name="gallery">IGALARI</string>
+    <string name="event_name">IGAMA LEMSITHO</string>
+    <string name="download_full_gallery">Khuphela yonke iGalari</string>
+    <string name="no_gallery_photos">AZIKHO IIFOTO EZIKHONA</string>
+    <string name="gallery_in_progress">Umfoti wakho usahlela kwaye elungisa iifoto zakho ezikumgangatho ophezulu. Nceda ujonge kwakhona kungekudala!</string>
+
+    <!-- Invoices -->
+    <string name="invoices">I-INVOYISI</string>
+    <string name="invoices_plural">II-INVOYISI</string>
+    <string name="view_invoices">BONA I-INVOYISI</string>
+    <string name="no_invoices">AZIKHO II-INVOYISI OKWANGOKU</string>
+    <string name="invoice_empty_desc">Bhukisha iphakheji yezithombe ukufumana nokujonga i-invoyisi yakho apha.</string>
+    <string name="download_invoice">KHUPHELA I-INVOYISI (PDF)</string>
+    <string name="copy_bank_details">KOPA IINKCUKACHA ZEBHANKI</string>
+    <string name="mark_as_paid">PHAWULA NJENGOKUBA IHLAWULWE</string>
+    <string name="record_payment">REKHODA INTLAWULO</string>
+
+    <!-- Navigation Menu -->
+    <string name="navigation">Ukunxibelelana</string>
+    <string name="home_screen">Isikrini saseKhaya</string>
+    <string name="bookings_menu">Izibhukisho</string>
+    <string name="invoices_menu">Ii-invoyisi</string>
+
+    <!-- Register Screen -->
+    <string name="register_title">Nceda faka iinkcukacha ukwenza iakhawunti</string>
+    <string name="date_of_birth">Umhla wokuzalwa</string>
+    <string name="select_dob_hint">Cofa ukukhetha Umhla wokuzalwa (DD/MM/YYYY)</string>
+    <string name="password_hint">Iphasiwedi (ubuncinane amagama angama-8)</string>
+    <string name="password_weak">Ibuthathaka: Ifuna amagama asi-8+, amakhulu, amancinci, inombolo nophawu</string>
+    <string name="password_moderate">Iphakathi: Uphantse wayigqiba! Faka uphawu olushiyekileyo</string>
+    <string name="password_strong">Iphasiwedi Yomelele ✓</string>
+    <string name="cape_town_disclaimer">📍 Qaphela: Umfoti usebenza eKapa nakwimimandla engqongileyo kuphela.</string>
+    <string name="sign_up">Bhalisa</string>
+    <string name="login">Ngena</string>
+    <string name="register">Bhalisa</string>
+
+    <!-- Settings Screen -->
+    <string name="appearance">INKONZO YEMBONAKALO</string>
+    <string name="dark_mode">Imowudi Emnyama</string>
+    <string name="dark_mode_sub">Tshintsha phakathi komxholo okhanyayo nomnyama</string>
+    <string name="color_palette">Imibala yeNkqubo</string>
+    <string name="palette_name">ILilac ne-Sage Green</string>
+    <string name="language_section">ULWIMI</string>
+    <string name="app_language">Ulwimi lwe-Apli</string>
+    <string name="notifications_section">IZAZISO</string>
+    <string name="booking_reminders">Izikhumbuzo zoBhukisho</string>
+    <string name="booking_reminders_sub">Fumana izilumkiso phambi kweseshoni yakho yezithombe</string>
+    <string name="gallery_alerts">Izaziso zeGalari</string>
+    <string name="gallery_alerts_sub">Isaziso xa iifoto ezihleliweyo zilayishiwe</string>
+    <string name="account_section">IAKHAWUNTI NEMIGAQO</string>
+    <string name="logged_in_as">Ungene njengo:</string>
+    <string name="change_password">Tshintsha Iphasiwedi</string>
+    <string name="studio_terms">Imigaqo noMthetho woBhukisho e-Studio</string>
+    <string name="terms_title">Imigaqo ye-Ily Photo Studio</string>
+    <string name="app_version_label">Ily Photo Studio v1.2.0 • Strandfontein, Cape Town</string>
+
+    <!-- Countdown & Status -->
+    <string name="countdown_label">Ukubala kwehla:</string>
+    <string name="status_label">Isimo:</string>
+    <string name="event_today">Iseshoni yeefoto YANAMHLANJE!</string>
+
+    <!-- Additional Localized UI Strings -->
+    <string name="login_title">Ngena</string>
+    <string name="enter_email_prompt">Nceda faka idilesi ye-imeyile yakho</string>
+    <string name="email_hint">Idilesi ye-imeyile</string>
+    <string name="enter_password_prompt">Nceda faka iphasiwedi yakho</string>
+    <string name="remember_me">Ndikhumbule</string>
+    <string name="forgot_password">Ulibele iphasiwedi?</string>
+    <string name="dont_have_account">Awunayo iakhawunti?</string>
+    <string name="sign_up_now">Bhalisa ngoku</string>
+    <string name="already_have_account">Sele unayo iakhawunti?</string>
+    <string name="login_now">Ngena ngoku</string>
+    <string name="settings_title">IZICWANGCISO</string>
+    <string name="home_title_label">IKHAYA</string>
+    <string name="your_upcoming_events">IMISITHO YAKHO EZAYO</string>
+    <string name="no_upcoming_events">AZIKHO IMISITHO EZAYO</string>
+    <string name="no_upcoming_events_desc">Awunayo imisitho yezithombe ezayo ecwangcisiweyo. Bhukisha iseshoni yezithombe namhlanje!</string>
+    <string name="book_a_session">BHUKISHA ISESHONI YEZITHOMBE</string>
+    <string name="days_remaining">Kusele iintsuku ezi-%1$d</string>
+    <string name="countdown_today">Namhlanje!</string>
+    <string name="countdown_tomorrow">Ngomso!</string>
+</resources>

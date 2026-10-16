@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/home_card_background"
+    android:elevation="4dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="18dp"
+    android:paddingBottom="18dp"
+    android:layout_marginBottom="16dp">
+
+    <!-- Subtitle: "UPCOMING EVENT" -->
+    <TextView
+        android:id="@+id/tvCardSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/upcoming_event"
+        android:textColor="@color/brand_text_dark"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Status Badge (Paid / Unpaid) -->
+    <TextView
+        android:id="@+id/tvCardStatusBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/badge_unpaid"
+        android:text="UNPAID"
+        android:textColor="#C62828"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Date Title: "BOOKING: 04 SEPTEMBER" -->
+    <TextView
+        android:id="@+id/tvCardBookingDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="BOOKING: 04 SEPTEMBER 2026"
+        android:textColor="@color/brand_text_dark"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginTop="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tvCardStatusBadge"
+        app:layout_constraintTop_toBottomOf="@id/tvCardSubtitle" />
+
+    <!-- Section Heading: "DETAILS" -->
+    <TextView
+        android:id="@+id/tvCardDetailsHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/details"
+        android:textColor="@color/brand_text_dark"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvCardBookingDate" />
+
+    <!-- Details Table -->
+    <LinearLayout
+        android:id="@+id/layoutCardDetailRows"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvCardDetailsHeading">
+
+        <!-- Event Type Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/event_type_label"
+                android:textColor="@color/brand_text_dark"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvCardEventType"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1.5"
+                android:background="@drawable/input_grey_background"
+                android:text="Matric Ball"
+                android:textColor="@color/brand_text_dark"
+                android:textSize="12sp"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+        </LinearLayout>
+
+        <!-- Location Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/location_label"
+                android:textColor="@color/brand_text_dark"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvCardLocation"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1.5"
+                android:background="@drawable/input_grey_background"
+                android:text="Strandfontein, Cape Town"
+                android:textColor="@color/brand_text_dark"
+                android:textSize="12sp"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+        </LinearLayout>
+
+        <!-- Price Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/price_label"
+                android:textColor="@color/brand_text_dark"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvCardPrice"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1.5"
+                android:background="@drawable/input_grey_background"
+                android:text="R400.00 (2 Hours)"
+                android:textColor="@color/brand_text_dark"
+                android:textSize="12sp"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+        </LinearLayout>
+
+        <!-- Payment Details Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/payment_details_label"
+                android:textColor="@color/brand_text_dark"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvCardPaymentDetails"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1.5"
+                android:background="@drawable/input_grey_background"
+                android:text="Paid via EFT"
+                android:textColor="@color/brand_text_dark"
+                android:textSize="12sp"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- "VIEW INVOICE" Button inside Card -->
+    <TextView
+        android:id="@+id/btnCardViewInvoice"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:background="@drawable/dropdown_pill_background"
+        android:elevation="2dp"
+        android:gravity="center"
+        android:text="@string/view_invoices"
+        android:textColor="@color/brand_text_dark"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.04"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginTop="14dp"
+        app:layout_constraintTop_toBottomOf="@id/layoutCardDetailRows"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Actions Row: Reschedule / Edit + Cancel -->
+    <LinearLayout
+        android:id="@+id/layoutCardActionsRow"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/btnCardViewInvoice"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- "RESCHEDULE / EDIT" Button -->
+        <TextView
+            android:id="@+id/btnCardEdit"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/login_button_background"
+            android:elevation="2dp"
+            android:gravity="center"
+            android:text="@string/edit"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.03"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- "CANCEL" Button (available only for unpaid bookings) -->
+        <TextView
+            android:id="@+id/btnCardCancel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/button_red_background"
+            android:elevation="2dp"
+            android:gravity="center"
+            android:text="CANCEL"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.03"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

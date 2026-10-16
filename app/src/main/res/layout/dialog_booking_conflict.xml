@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="24dp"
+    android:layout_marginEnd="24dp"
+    android:background="@drawable/dialog_conflict_background"
+    android:elevation="12dp"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    android:paddingTop="36dp"
+    android:paddingBottom="36dp">
+
+    <!-- Title "OOPS!" -->
+    <TextView
+        android:id="@+id/tvConflictTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/conflict_oops"
+        android:textColor="@color/brand_text_dark"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.04"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Conflict Message -->
+    <TextView
+        android:id="@+id/tvConflictMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/conflict_message"
+        android:textColor="@color/brand_text_dark"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:lineSpacingExtra="5dp"
+        android:layout_marginTop="18dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvConflictTitle" />
+
+    <!-- "CLOSE" Button -->
+    <TextView
+        android:id="@+id/btnConflictClose"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:background="@drawable/button_red_background"
+        android:elevation="4dp"
+        android:gravity="center"
+        android:text="@string/close"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.04"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvConflictMessage"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

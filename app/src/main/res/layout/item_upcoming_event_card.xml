@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/home_card_background"
+    android:elevation="4dp"
+    android:paddingStart="18dp"
+    android:paddingEnd="18dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:layout_marginBottom="14dp">
+
+    <!-- Header: Event Label -->
+    <TextView
+        android:id="@+id/tvUpcomingCardLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/upcoming_event"
+        android:textColor="@color/brand_text_dark"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tvUpcomingStatusBadge"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Status Badge (Approved / Pending / Confirmed / Cancelled) -->
+    <TextView
+        android:id="@+id/tvUpcomingStatusBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/badge_paid"
+        android:text="APPROVED"
+        android:textColor="#FFFFFF"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Service Title (e.g. Portrait Session / Matric Ball) -->
+    <TextView
+        android:id="@+id/tvUpcomingServiceName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Matric Ball Photoshoot"
+        android:textColor="@color/brand_lilac_dark"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvUpcomingCardLabel" />
+
+    <!-- Date & Time -->
+    <TextView
+        android:id="@+id/tvUpcomingDateTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="📅 04 September 2026 • 14:00"
+        android:textColor="@color/brand_text_dark"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:layout_marginTop="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvUpcomingServiceName" />
+
+    <!-- Location -->
+    <TextView
+        android:id="@+id/tvUpcomingLocation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="📍 Strandfontein, Cape Town"
+        android:textColor="@color/brand_text_muted"
+        android:textSize="12sp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvUpcomingDateTime" />
+
+    <!-- Live Countdown Row -->
+    <LinearLayout
+        android:id="@+id/layoutCountdown"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/badge_countdown"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnUpcomingMore"
+        app:layout_constraintTop_toBottomOf="@id/tvUpcomingLocation"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/tvUpcomingCountdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⏳ 12 days 4 hrs remaining"
+            android:textColor="@color/brand_text_dark"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- "MORE / VIEW" Button -->
+    <TextView
+        android:id="@+id/btnUpcomingMore"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:background="@drawable/login_button_background"
+        android:elevation="2dp"
+        android:gravity="center"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
+        android:text="@string/more"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/layoutCountdown"
+        app:layout_constraintBottom_toBottomOf="@id/layoutCountdown" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

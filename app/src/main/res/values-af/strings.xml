@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">IlyPhoto</string>
+    <string name="home">TUIS</string>
+    <string name="ily_photo_title">ILY FOTO.</string>
+    <string name="capturing_every_moment">VANG ELKE OOMBLIK VAS</string>
+    <string name="upcoming_event">KOMENDE GELEENTHEID</string>
+    <string name="sample_booking">BESPREKING: 04 SEPTEMBER</string>
+    <string name="more">MEER</string>
+    <string name="view_bookings">SIEN BESPREKINGS</string>
+    <string name="search">Soek</string>
+    <string name="settings">Stellings</string>
+    <string name="menu">Kieslys</string>
+
+    <!-- Profile -->
+    <string name="profile">Profiel</string>
+    <string name="first_name">Voornaam</string>
+    <string name="last_name">Van</string>
+    <string name="email_address">E-posadres</string>
+    <string name="contact_details">Kontakbesonderhede</string>
+    <string name="log_out">Teken Uit</string>
+
+    <!-- Packages -->
+    <string name="packages">PAKKETTE</string>
+    <string name="matric_balls">MATRIEKAFSKOP</string>
+    <string name="matric_balls_price">R400 VIR 2 URE</string>
+    <string name="weddings">TROUES</string>
+    <string name="weddings_price">VANAF R1200 VIR 6 URE</string>
+    <string name="events">GELEENTHEDE</string>
+    <string name="events_price">R400 VIR 2 URE</string>
+    <string name="book">BESPREEK</string>
+
+    <!-- Booking -->
+    <string name="booking">BESPREKING</string>
+    <string name="select_a_date">Kies \'n datum</string>
+    <string name="make_booking">Maak Bespreking</string>
+    <string name="conflict_oops">OEPS!</string>
+    <string name="conflict_message">DIT LYK OF DAAR REEDS \'N GELEENTHEID BESPREEK IS.\nKIES ASSEBLIEF \'N ANDER DATUM</string>
+    <string name="close">MAAK TOE</string>
+
+    <!-- My Booking -->
+    <string name="my_booking">MY BESPREKINGS</string>
+    <string name="details">BESONDERHEDE</string>
+    <string name="event_type_label">SOORT GELEENTHEID:</string>
+    <string name="location_label">LIGGING:</string>
+    <string name="price_label">PRYS:</string>
+    <string name="payment_details_label">BETALINGSBESONDERHEDE:</string>
+    <string name="edit">WYSIG</string>
+    <string name="make_a_booking">MAAK \'N BESPREKING</string>
+    <string name="no_upcoming_bookings">GEEN KOMENDE BESPREKINGS</string>
+    <string name="no_upcoming_bookings_desc">Jy het nog geen geskeduleerde fotosessies nie. Tik \'MAAK \'N BESPREKING\' hieronder om jou datum by ILY FOTO te bespreek!</string>
+
+    <!-- Gallery -->
+    <string name="gallery">GALERY</string>
+    <string name="event_name">NAAM VAN GELEENTHEID</string>
+    <string name="download_full_gallery">Laai volledige Galery af</string>
+    <string name="no_gallery_photos">GEEN FOTO\'S BESKIKBAAR</string>
+    <string name="gallery_in_progress">Jou fotograaf verwerk en redigeer tans jou hoë-resolusie foto\'s. Kom kyk gerus binnekort weer!</string>
+
+    <!-- Invoices -->
+    <string name="invoices">FAKTUUR</string>
+    <string name="invoices_plural">FAKTURE</string>
+    <string name="view_invoices">SIEN FAKTUUR</string>
+    <string name="no_invoices">NOG GEEN FAKTURE</string>
+    <string name="invoice_empty_desc">Bespreek \'n fotografiesessie om jou amptelike faktuur hier te sien.</string>
+    <string name="download_invoice">LAAI FAKTUUR AF (PDF)</string>
+    <string name="copy_bank_details">KOPIEER BANKBESONDERHEDE</string>
+    <string name="mark_as_paid">MERK AS BETAAL</string>
+    <string name="record_payment">BOEK BETALING</string>
+
+    <!-- Navigation Menu -->
+    <string name="navigation">Navigasie</string>
+    <string name="home_screen">Tuisskerm</string>
+    <string name="bookings_menu">Besprekings</string>
+    <string name="invoices_menu">Fakture</string>
+
+    <!-- Register Screen -->
+    <string name="register_title">Voer asseblief besonderhede in om rekening te skep</string>
+    <string name="date_of_birth">Geboortedatum</string>
+    <string name="select_dob_hint">Tik om Geboortedatum te kies (DD/MM/JJJJ)</string>
+    <string name="password_hint">Wagwoord (min 8 karakters)</string>
+    <string name="password_weak">Swak: Benodig 8+ karakters, hoof- &amp; kleinletters, syfer &amp; simbool</string>
+    <string name="password_moderate">Matig: Byna daar! Voeg ontbrekende tekens by</string>
+    <string name="password_strong">Sterk Wagwoord ✓</string>
+    <string name="cape_town_disclaimer">📍 Kennisgewing: Fotograaf werk slegs in en om Kaapstad.</string>
+    <string name="sign_up">Registreer</string>
+    <string name="login">Teken In</string>
+    <string name="register">Registreer</string>
+
+    <!-- Settings Screen -->
+    <string name="appearance">VOORKOMS</string>
+    <string name="dark_mode">Donkermodus</string>
+    <string name="dark_mode_sub">Wissel tussen ligte en donker tema</string>
+    <string name="color_palette">Kleurpalet</string>
+    <string name="palette_name">Lila &amp; Saliagroen</string>
+    <string name="language_section">TAAL</string>
+    <string name="app_language">Toepassingstaal</string>
+    <string name="notifications_section">KENNISGEWINGS</string>
+    <string name="booking_reminders">Besprekingsherinneringe</string>
+    <string name="booking_reminders_sub">Kry waarskuwings voor jou geskeduleerde fotosessie</string>
+    <string name="gallery_alerts">Galery-oplaaie</string>
+    <string name="gallery_alerts_sub">Kennisgewing wanneer geredigeerde foto\'s gereed is</string>
+    <string name="account_section">REKENING &amp; BELEID</string>
+    <string name="logged_in_as">Aangemeld as:</string>
+    <string name="change_password">Verander Wagwoord</string>
+    <string name="studio_terms">Ateljee Besprekingsterme &amp; Beleid</string>
+    <string name="terms_title">Ily Foto Ateljee Terme &amp; Beleid</string>
+    <string name="app_version_label">Ily Foto Ateljee v1.2.0 • Strandfontein, Kaapstad</string>
+
+    <!-- Countdown & Status -->
+    <string name="countdown_label">Aftelling:</string>
+    <string name="status_label">Status:</string>
+    <string name="event_today">Fotosessie is VANDAG!</string>
+
+    <!-- Additional Localized UI Strings -->
+    <string name="login_title">Teken In</string>
+    <string name="enter_email_prompt">Voer asseblief jou e-posadres in</string>
+    <string name="email_hint">E-posadres</string>
+    <string name="enter_password_prompt">Voer asseblief jou wagwoord in</string>
+    <string name="remember_me">Onthou my</string>
+    <string name="forgot_password">Wagwoord vergeet?</string>
+    <string name="dont_have_account">Het jy nie \'n rekening nie?</string>
+    <string name="sign_up_now">Registreer nou</string>
+    <string name="already_have_account">Het jy reeds \'n rekening?</string>
+    <string name="login_now">Teken nou in</string>
+    <string name="settings_title">STELLINGS</string>
+    <string name="home_title_label">TUIS</string>
+    <string name="your_upcoming_events">JOU KOMENDE GELEENTHEDE</string>
+    <string name="no_upcoming_events">GEEN KOMENDE GELEENTHEDE</string>
+    <string name="no_upcoming_events_desc">Jy het nog geen komende fotosessies geskeduleer nie. Bespreek \'n fotosessie vandag!</string>
+    <string name="book_a_session">BESPREEK \'N FOTOSESSIE</string>
+    <string name="days_remaining">%1$d dae oor</string>
+    <string name="countdown_today">Vandag!</string>
+    <string name="countdown_tomorrow">Môre!</string>
+</resources>

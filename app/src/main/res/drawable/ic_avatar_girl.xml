@@ -1,0 +1,44 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="72dp"
+    android:height="72dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <!-- Pink background circle -->
+    <path
+        android:fillColor="#FF5277"
+        android:pathData="M50,50m-48,0a48,48 0 1,0 96,0a48,48 0 1,0 -96,0" />
+    <!-- Hair back -->
+    <path
+        android:fillColor="#261C19"
+        android:pathData="M32,38 Q50,22 68,38 Q74,60 68,76 Q60,70 50,70 Q40,70 32,76 Q26,60 32,38 Z" />
+    <!-- Neck -->
+    <path
+        android:fillColor="#D89A72"
+        android:pathData="M44,60 L56,60 L56,72 L44,72 Z" />
+    <!-- Shirt -->
+    <path
+        android:fillColor="#E91E63"
+        android:pathData="M30,94 C30,76 42,70 50,70 C58,70 70,76 70,94 Z" />
+    <!-- Face -->
+    <path
+        android:fillColor="#E8AA82"
+        android:pathData="M50,56m-18,0a18,18 0 1,0 36,0a18,18 0 1,0 -36,0" />
+    <!-- Bangs Hair front -->
+    <path
+        android:fillColor="#261C19"
+        android:pathData="M32,46 C32,32 40,28 50,28 C60,28 68,32 68,46 C64,42 56,44 50,42 C44,44 36,42 32,46 Z" />
+    <!-- Eyes -->
+    <path
+        android:fillColor="#261C19"
+        android:pathData="M42,54m-2.5,0a2.5,2.5 0 1,0 5,0a2.5,2.5 0 1,0 -5,0" />
+    <path
+        android:fillColor="#261C19"
+        android:pathData="M58,54m-2.5,0a2.5,2.5 0 1,0 5,0a2.5,2.5 0 1,0 -5,0" />
+    <!-- Smile -->
+    <path
+        android:strokeColor="#261C19"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M47,63 Q50,65 53,63" />
+</vector>

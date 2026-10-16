@@ -1,0 +1,621 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_lilac_green_gradient">
+
+    <!-- Top Header: Logo -->
+    <ImageView
+        android:id="@+id/invoiceLogo"
+        android:layout_width="74dp"
+        android:layout_height="78dp"
+        android:src="@drawable/ily_photo_logo"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/app_name"
+        android:background="#FFFFFF"
+        android:padding="2dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp" />
+
+    <!-- Top Header: Title "ILY PHOTO." -->
+    <TextView
+        android:id="@+id/invoiceTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/ily_photo_title"
+        android:textColor="@color/white"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintStart_toEndOf="@id/invoiceLogo"
+        app:layout_constraintEnd_toStartOf="@id/btnTopProfile"
+        app:layout_constraintTop_toTopOf="@id/invoiceLogo"
+        app:layout_constraintBottom_toBottomOf="@id/invoiceLogo" />
+
+    <!-- Top Right Profile Button -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btnTopProfile"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginEnd="20dp"
+        app:cardCornerRadius="22dp"
+        app:cardElevation="3dp"
+        app:cardBackgroundColor="@color/white"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="@id/invoiceLogo"
+        app:layout_constraintBottom_toBottomOf="@id/invoiceLogo"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/ivTopProfileAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_avatar_girl"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/profile" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Top Divider above "INVOICE" -->
+    <View
+        android:id="@+id/dividerInvoiceTop"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/brand_divider"
+        android:layout_marginTop="18dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/invoiceLogo" />
+
+    <!-- Section Title: "INVOICES" -->
+    <TextView
+        android:id="@+id/invoiceSectionLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/invoices_plural"
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        android:letterSpacing="0.06"
+        android:fontFamily="sans-serif"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dividerInvoiceTop" />
+
+    <!-- Bottom Divider below "INVOICE" -->
+    <View
+        android:id="@+id/dividerInvoiceBottom"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/brand_divider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/invoiceSectionLabel" />
+
+    <!-- Tagline: "CAPTURING EVERY MOMENT" -->
+    <TextView
+        android:id="@+id/invoiceTagline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/capturing_every_moment"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:letterSpacing="0.06"
+        android:fontFamily="sans-serif"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dividerInvoiceBottom" />
+
+    <!-- Scrollable container for invoice details -->
+    <ScrollView
+        android:id="@+id/scrollInvoiceContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/invoiceTagline"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="16dp">
+
+            <!-- Empty State Card (Visible when user has no bookings/invoices) -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cardEmptyInvoice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/home_card_background"
+                android:elevation="4dp"
+                android:padding="24dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvEmptyTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_invoices"
+                    android:textColor="@color/brand_text_dark"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvEmptySubtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/invoice_empty_desc"
+                    android:textColor="@color/brand_text_muted"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvEmptyTitle" />
+
+                <TextView
+                    android:id="@+id/btnEmptyBook"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:background="@drawable/login_button_background"
+                    android:elevation="2dp"
+                    android:gravity="center"
+                    android:text="@string/make_a_booking"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="20dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/tvEmptySubtitle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Main Invoice Card -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cardInvoiceDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/home_card_background"
+                android:elevation="4dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp">
+
+                <!-- Header: Official Invoice & Status Badge -->
+                <TextView
+                    android:id="@+id/tvInvoiceHeading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TAX INVOICE"
+                    android:textColor="@color/brand_text_dark"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvInvoiceStatusBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/badge_unpaid"
+                    android:text="UNPAID"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tvInvoiceHeading"
+                    app:layout_constraintBottom_toBottomOf="@id/tvInvoiceHeading" />
+
+                <!-- Invoice Number -->
+                <TextView
+                    android:id="@+id/tvInvoiceNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="INV-049281"
+                    android:textColor="@color/brand_lilac_dark"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="6dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvInvoiceHeading" />
+
+                <!-- Studio / Photographer Header -->
+                <TextView
+                    android:id="@+id/tvStudioInfo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="ILY PHOTO • Aysha Allie\n8 Green Way, Strandfontein, Cape Town\n084 899 3280 • ayshaallie23@gmail.com"
+                    android:textColor="@color/brand_text_muted"
+                    android:textSize="12sp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvInvoiceNumber" />
+
+                <View
+                    android:id="@+id/dividerCardMid1"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#20000000"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvStudioInfo" />
+
+                <!-- Client Details Section -->
+                <TextView
+                    android:id="@+id/tvBilledToHeading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="BILLED TO:"
+                    android:textColor="@color/brand_text_dark"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/dividerCardMid1" />
+
+                <TextView
+                    android:id="@+id/tvClientDetails"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Client Name\nclient@example.com • 068 581 6456"
+                    android:textColor="@color/brand_text_dark"
+                    android:textSize="13sp"
+                    android:layout_marginTop="4dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvBilledToHeading" />
+
+                <View
+                    android:id="@+id/dividerCardMid2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#20000000"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvClientDetails" />
+
+                <!-- Booking Services Breakdown Table -->
+                <LinearLayout
+                    android:id="@+id/layoutInvoiceItems"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/dividerCardMid2">
+
+                    <!-- Service Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.2"
+                            android:text="SERVICE / EVENT:"
+                            android:textColor="@color/brand_text_dark"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvInvoiceService"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.5"
+                            android:text="Matric Ball Shoot"
+                            android:textColor="@color/brand_text_dark"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Date & Time Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.2"
+                            android:text="DATE &amp; TIME:"
+                            android:textColor="@color/brand_text_dark"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvInvoiceDateTime"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.5"
+                            android:text="04 September 2026 @ 14:00"
+                            android:textColor="@color/brand_text_dark"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Location Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.2"
+                            android:text="LOCATION:"
+                            android:textColor="@color/brand_text_dark"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvInvoiceLocation"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.5"
+                            android:text="Strandfontein, Cape Town"
+                            android:textColor="@color/brand_text_dark"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Duration Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.2"
+                            android:text="DURATION:"
+                            android:textColor="@color/brand_text_dark"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvInvoiceDuration"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.5"
+                            android:text="2 Hours Session"
+                            android:textColor="@color/brand_text_dark"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Total Amount Box -->
+                <LinearLayout
+                    android:id="@+id/layoutTotalAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/input_grey_background"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:layout_marginTop="14dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/layoutInvoiceItems">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="TOTAL AMOUNT DUE:"
+                        android:textColor="@color/brand_text_dark"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvInvoiceTotalAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R400.00"
+                        android:textColor="@color/brand_lilac_dark"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- EFT Banking Details Container -->
+                <LinearLayout
+                    android:id="@+id/layoutBankDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/input_grey_background"
+                    android:padding="12dp"
+                    android:layout_marginTop="14dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/layoutTotalAmount">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="EFT BANK PAYMENT DETAILS"
+                        android:textColor="@color/brand_text_dark"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvBankInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Bank: First National Bank (FNB)\nAccount: ILY Photo (Aysha Allie)\nAccount No: 62849103847\nBranch: 250655\nReference: INV-049281"
+                        android:textColor="@color/brand_text_dark"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Action Button: Copy Bank Details -->
+                <TextView
+                    android:id="@+id/btnCopyBankDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:background="@drawable/login_button_background"
+                    android:elevation="2dp"
+                    android:gravity="center"
+                    android:text="@string/copy_bank_details"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.04"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/layoutBankDetails" />
+
+                <!-- Action Button: Download Invoice / Receipt -->
+                <TextView
+                    android:id="@+id/btnDownloadInvoice"
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:background="@drawable/dropdown_pill_background"
+                    android:elevation="1dp"
+                    android:gravity="center"
+                    android:text="@string/download_invoice"
+                    android:textColor="@color/brand_text_dark"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.04"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/btnCopyBankDetails" />
+
+                <!-- Action Button: Pay / Record Payment -->
+                <TextView
+                    android:id="@+id/btnRecordPayment"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@drawable/login_button_background"
+                    android:elevation="2dp"
+                    android:gravity="center"
+                    android:text="@string/record_payment"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.04"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/btnDownloadInvoice"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Navigation Bar -->
+    <LinearLayout
+        android:id="@+id/bottomNavBar"
+        android:layout_width="0dp"
+        android:layout_height="68dp"
+        android:background="@drawable/bottom_nav_background"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:weightSum="3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Home Tab -->
+        <FrameLayout
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_home"
+                android:contentDescription="@string/home" />
+        </FrameLayout>
+
+        <!-- Settings Tab -->
+        <FrameLayout
+            android:id="@+id/navSettings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_settings"
+                android:contentDescription="@string/settings" />
+        </FrameLayout>
+
+        <!-- Menu Tab -->
+        <FrameLayout
+            android:id="@+id/navMenu"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_menu"
+                android:contentDescription="@string/menu" />
+        </FrameLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

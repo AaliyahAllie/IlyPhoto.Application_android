@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- IlyPhoto Aesthetic Lilac & Sage Green Color Palette -->
+    <!-- Screen Backgrounds: Serene Botanical Sage Green -->
+    <color name="brand_brown">#FF7E907B</color> <!-- Main background (Sage Green) -->
+    <color name="brand_sage_bg">#FF7E907B</color>
+    <color name="brand_sage_dark">#FF5E705C</color>
+    <color name="brand_sage_light">#FF9EB09B</color>
+    <color name="brand_sage_subtle">#FFEFF4EE</color>
+
+    <!-- Dreamy Lilac / Lavender for Primary Buttons & Highlights -->
+    <color name="brand_coral">#FFA38EC5</color> <!-- Primary Button Accent (Lilac) -->
+    <color name="brand_lilac">#FFA38EC5</color>
+    <color name="brand_lilac_dark">#FF8C75B3</color>
+    <color name="brand_lilac_light">#FFE9E2F4</color>
+    <color name="brand_coral_stroke">#FF8F77B5</color>
+
+    <!-- Cards & Panels -->
+    <color name="brand_card_bg">#FFFFFFFF</color>
+    <color name="brand_card_stroke">#FFE2E8E1</color>
+
+    <!-- Bottom Navigation Bar -->
+    <color name="brand_nav_bg">#FFF1F5F0</color>
+    <color name="brand_nav_icon">#FF2A3A2C</color>
+    <color name="brand_divider">#4DFFFFFF</color>
+
+    <!-- Typography -->
+    <color name="brand_text_dark">#FF1E281F</color>
+    <color name="brand_text_muted">#FF637365</color>
+    <color name="brand_text_light">#FFFFFFFF</color>
+
+    <!-- Form Inputs -->
+    <color name="brand_input_bg">#FFF3F7F2</color>
+    <color name="brand_input_stroke">#FFC8D6C6</color>
+    <color name="brand_input_placeholder">#FF7D8C7F</color>
+
+    <!-- Menu & Modal Drawer -->
+    <color name="brand_menu_bg">#FFDCD4E8</color> <!-- Soft dusty lilac drawer -->
+    <color name="brand_menu_text">#FF2B1E3B</color>
+
+    <!-- Accents & Actions -->
+    <color name="brand_logout_red">#FFD45D5D</color>
+    <color name="brand_logout_red_dark">#FFB84343</color>
+    <color name="brand_calendar_header">#FF8975AA</color> <!-- Lilac Calendar Header -->
+    <color name="brand_calendar_accent">#FFA38EC5</color>
+    <color name="brand_calendar_booked">#FFD45D5D</color>
+    <color name="brand_dialog_bg">#FFF1F5F0</color>
+</resources>
