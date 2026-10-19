@@ -83,6 +83,7 @@
         android:text="@string/packages"
         android:textColor="@color/white"
         android:textSize="17sp"
+        android:textStyle="bold"
         android:letterSpacing="0.06"
         android:fontFamily="sans-serif"
         android:paddingTop="12dp"
@@ -109,9 +110,10 @@
         android:text="@string/capturing_every_moment"
         android:textColor="@color/white"
         android:textSize="14sp"
+        android:textStyle="bold"
         android:letterSpacing="0.06"
         android:fontFamily="sans-serif"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dividerPackagesBottom" />
@@ -121,8 +123,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="14dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/packagesTagline"
@@ -133,7 +135,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingStart="20dp"
-            android:paddingEnd="20dp">
+            android:paddingEnd="20dp"
+            android:paddingBottom="12dp">
 
             <!-- Package 1: MATRIC BALLS -->
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -154,7 +157,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/matric_balls"
                     android:textColor="@color/brand_text_dark"
-                    android:textSize="14sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -167,7 +170,7 @@
                     android:textColor="@color/brand_text_dark"
                     android:textSize="13sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="6dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvMatricBallsTitle"
                     app:layout_constraintBottom_toBottomOf="parent" />
@@ -175,7 +178,7 @@
                 <TextView
                     android:id="@+id/btnBookMatricBalls"
                     android:layout_width="wrap_content"
-                    android:layout_height="36dp"
+                    android:layout_height="40dp"
                     android:background="@drawable/login_button_background"
                     android:elevation="2dp"
                     android:gravity="center"
@@ -212,7 +215,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/weddings"
                     android:textColor="@color/brand_text_dark"
-                    android:textSize="14sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -225,7 +228,7 @@
                     android:textColor="@color/brand_text_dark"
                     android:textSize="13sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="6dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvWeddingsTitle"
                     app:layout_constraintBottom_toBottomOf="parent" />
@@ -233,7 +236,7 @@
                 <TextView
                     android:id="@+id/btnBookWeddings"
                     android:layout_width="wrap_content"
-                    android:layout_height="36dp"
+                    android:layout_height="40dp"
                     android:background="@drawable/login_button_background"
                     android:elevation="2dp"
                     android:gravity="center"
@@ -262,7 +265,7 @@
                 android:paddingEnd="16dp"
                 android:paddingTop="18dp"
                 android:paddingBottom="18dp"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="14dp">
 
                 <TextView
                     android:id="@+id/tvEventsTitle"
@@ -270,7 +273,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/events"
                     android:textColor="@color/brand_text_dark"
-                    android:textSize="14sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -283,7 +286,7 @@
                     android:textColor="@color/brand_text_dark"
                     android:textSize="13sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="6dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvEventsTitle"
                     app:layout_constraintBottom_toBottomOf="parent" />
@@ -291,7 +294,99 @@
                 <TextView
                     android:id="@+id/btnBookEvents"
                     android:layout_width="wrap_content"
-                    android:layout_height="36dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/login_button_background"
+                    android:elevation="2dp"
+                    android:gravity="center"
+                    android:paddingStart="22dp"
+                    android:paddingEnd="22dp"
+                    android:text="@string/book"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Package 4: COMMUNITY & NGO OUTREACH (Substantiates Strandfontein & Cape Flats NGO / Community Need) -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cardCommunityOutreach"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/home_card_background"
+                android:elevation="3dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="18dp"
+                android:paddingBottom="18dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/tvCommunityBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/badge_paid"
+                    android:text="NGO &amp; YOUTH IMPACT"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvCommunityTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/community_outreach_title"
+                    android:textColor="@color/brand_text_dark"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="12dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/btnBookCommunityOutreach"
+                    app:layout_constraintTop_toBottomOf="@id/tvCommunityBadge" />
+
+                <TextView
+                    android:id="@+id/tvCommunityPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/community_outreach_price"
+                    android:textColor="@color/brand_lilac_dark"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="12dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/btnBookCommunityOutreach"
+                    app:layout_constraintTop_toBottomOf="@id/tvCommunityTitle" />
+
+                <TextView
+                    android:id="@+id/tvCommunityDesc"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/community_outreach_desc"
+                    android:textColor="@color/brand_text_muted"
+                    android:textSize="13sp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="12dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/btnBookCommunityOutreach"
+                    app:layout_constraintTop_toBottomOf="@id/tvCommunityPrice"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <TextView
+                    android:id="@+id/btnBookCommunityOutreach"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
                     android:background="@drawable/login_button_background"
                     android:elevation="2dp"
                     android:gravity="center"
@@ -316,7 +411,7 @@
     <TextView
         android:id="@+id/btnPackagesViewBookings"
         android:layout_width="0dp"
-        android:layout_height="46dp"
+        android:layout_height="48dp"
         android:layout_marginStart="36dp"
         android:layout_marginEnd="36dp"
         android:layout_marginBottom="36dp"

@@ -5,43 +5,44 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import java.util.Date
 
-/** Client reviews backed by Azure Cosmos DB. One review per signed-in client. */
-class ReviewRepository {
+/**
+ * Client reviews backed by Azure Table Storage (`Reviews` table).
+ * One review per signed-in client (`RowKey = ClientId`).
+ */
+class ReviewRepository(
+    private val api: IlyCloudApi = AzureApiClient
+) {
 
     private val localReviews = MutableStateFlow<List<Review>>(emptyList())
 
     fun reviews(): Flow<List<Review>> = flow {
-        emit(localReviews.value)
-
         try {
-            val remote = AzureApiClient.getReviews()
-            val remoteIds = remote.map { it.id }.toSet()
-            val unsyncedLocal = localReviews.value.filter { it.id !in remoteIds }
-            val combined = (unsyncedLocal + remote).sortedByDescending { it.createdAt?.time ?: 0L }
-            localReviews.value = combined
-            emit(combined)
+            val remote = api.getReviews().sortedByDescending { it.createdAt?.time ?: 0L }
+            localReviews.value = remote
+            emit(remote)
         } catch (_: Exception) {
             emit(localReviews.value)
         }
     }
 
-    /** Creates or replaces the current user's review in Azure Cosmos DB. */
+    /** Creates or replaces the current user's review in Azure Table Storage. */
     suspend fun submit(text: String): Result<Unit> = azureCall {
+        val cleanText = text.trim()
+        require(cleanText.isNotBlank()) { "Please write a review before submitting." }
+
         val user = AzureProvider.getCachedProfile()
             ?: error("Please sign in to leave a review.")
         val now = Date()
+        val reviewId = user.clientId.ifBlank { user.uid }
         val review = Review(
-            id = user.uid,
+            id = reviewId,
             authorName = user.displayName.takeIf { it.isNotBlank() }
                 ?: user.email.substringBefore('@'),
-            text = text.trim(),
+            text = cleanText,
             createdAt = now,
         )
-        localReviews.value = listOf(review) + localReviews.value.filterNot { it.id == user.uid }
 
-        try {
-            AzureApiClient.submitReview(review)
-        } catch (_: Exception) {}
-        Unit
+        api.submitReview(review)
+        localReviews.value = listOf(review) + localReviews.value.filterNot { it.id == reviewId }
     }
 }

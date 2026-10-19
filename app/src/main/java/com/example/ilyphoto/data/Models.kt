@@ -38,9 +38,13 @@ data class UserProfile(
         if (role == UserRole.PHOTOGRAPHER) return true
         val bCid = booking.clientId.trim()
         val bEmail = booking.clientEmail.trim()
-        if (clientId.isNotBlank() && bCid.equals(clientId, ignoreCase = true)) return true
-        if (uid.isNotBlank() && bCid.equals(uid, ignoreCase = true)) return true
-        if (email.isNotBlank() && bEmail.equals(email, ignoreCase = true)) return true
+        val bName = booking.clientName.trim()
+
+        if (email.isNotBlank() && (bEmail.equals(email, ignoreCase = true) || bCid.equals(email, ignoreCase = true))) return true
+        if (clientId.isNotBlank() && (bCid.equals(clientId, ignoreCase = true) || bEmail.equals(clientId, ignoreCase = true))) return true
+        if (uid.isNotBlank() && (bCid.equals(uid, ignoreCase = true) || bEmail.equals(uid, ignoreCase = true))) return true
+        if (displayName.isNotBlank() && bName.equals(displayName, ignoreCase = true)) return true
+        if (username.isNotBlank() && (bCid.equals(username, ignoreCase = true) || bName.equals(username, ignoreCase = true))) return true
         return false
     }
 
@@ -106,20 +110,20 @@ sealed interface Session {
     data class SignedIn(val profile: UserProfile) : Session
 }
 
-/** Azure Cosmos DB Document / API Entity in `photos` container (Portfolio entity). */
+/** Azure Table Storage Entity / API Entity in `photos` and `galleries` tables (Portfolio entity). */
 data class Photo(
     val id: String = "",
     val title: String = "",
     val description: String = "",
     val category: String = "",
     val tags: List<String> = emptyList(),
-    /** Direct HTTPS URL or SAS URL from Azure Blob Storage. */
+    /** Direct HTTPS URL or SAS URL from Azure Blob Storage (`ilyphoto-galleries`). */
     val imageUrl: String = "",
-    /** Blob path relative to Azure Blob Storage container. */
+    /** Blob path relative to Azure Blob Storage container (`galleries/{ClientId}/{GalleryId}/{FileName}`). */
     val storagePath: String = "",
-    /** Owner UID; required for client-gallery authorisation and filtering. */
+    /** Owner ClientId (`CL-xxxx`) or UID; required for client-gallery authorisation and filtering. */
     val clientId: String = "",
-    /** Booking/gallery identifier that this photo belongs to. */
+    /** Booking/gallery identifier (`RowKey`) that this photo belongs to. */
     val bookingId: String = "",
     val photographerId: String = "",
     val createdAt: Date? = null,
@@ -149,23 +153,26 @@ data class Photo(
                 }
             }
             return Photo(
-                id = json.optString("id").ifBlank { json.optString("_id") },
-                title = json.optString("title"),
-                description = json.optString("description"),
-                category = json.optString("category"),
+                id = json.optString("id").ifBlank { json.optString("RowKey").ifBlank { json.optString("_id") } },
+                title = json.optString("title").ifBlank { json.optString("Title") },
+                description = json.optString("description").ifBlank { json.optString("Description") },
+                category = json.optString("category").ifBlank { json.optString("Category") },
                 tags = tagsList,
-                imageUrl = json.optString("imageUrl"),
-                storagePath = json.optString("storagePath"),
-                clientId = json.optString("clientId"),
-                bookingId = json.optString("bookingId"),
-                photographerId = json.optString("photographerId"),
-                createdAt = parseDate(json.optString("createdAt"))
+                imageUrl = json.optString("imageUrl").ifBlank { json.optString("ImageUrl") },
+                storagePath = json.optString("storagePath").ifBlank { json.optString("StoragePath") },
+                clientId = json.optString("clientId").ifBlank { json.optString("ClientId") },
+                bookingId = json.optString("bookingId").ifBlank { json.optString("BookingId") },
+                photographerId = json.optString("photographerId").ifBlank { json.optString("PhotographerId") },
+                createdAt = parseDate(json.optString("createdAt").ifBlank { json.optString("CreatedAt") })
             )
         }
     }
 }
 
-/** Azure Cosmos DB Document / API Entity in `bookings` container. */
+/**
+ * Azure Table Storage Entity in `bookings` table (`PartitionKey = "booking"`, `RowKey = id`).
+ * Linked to `users` via [clientId] (`CL-xxxx`) and [clientEmail], and to `invoices` via [invoiceNumber].
+ */
 data class Booking(
     val id: String = "",
     val clientId: String = "",
@@ -179,11 +186,26 @@ data class Booking(
     val eventTime: String = "",
     val eventLocation: String = "",
     val requirements: String = "",
-    val status: String = "Pending", // Pending, Confirmed, Rescheduled, Completed, Cancelled
+    val status: String = "Pending", // Pending, Confirmed, Approved, Rescheduled, Completed, Cancelled, Rejected
     val invoiceNumber: String = "",
     val invoiceStatus: String = "Unpaid", // Unpaid, Partially Paid, Paid
     val createdAt: Date? = null,
 ) {
+    val isActiveReservation: Boolean
+        get() = !status.equals("Cancelled", ignoreCase = true) &&
+            !status.equals("Rejected", ignoreCase = true) &&
+            !status.equals("Denied", ignoreCase = true)
+
+    fun conflictsWithDate(targetDate: String, excludeBookingId: String? = null): Boolean {
+        if (!excludeBookingId.isNullOrBlank() && id.equals(excludeBookingId, ignoreCase = true)) {
+            return false
+        }
+        if (!isActiveReservation) return false
+        val targetKey = normalizeDateKey(targetDate)
+        val existingKey = normalizeDateKey(eventDate)
+        return targetKey.isNotBlank() && targetKey.equals(existingKey, ignoreCase = true)
+    }
+
     fun toInvoice(): Invoice = Invoice(
         invoiceId = invoiceNumber.ifBlank { "INV-" + id.take(6).uppercase() },
         bookingId = id,
@@ -221,30 +243,65 @@ data class Booking(
     }
 
     companion object {
+        private val dateParsePatterns = listOf(
+            "dd MMMM yyyy",
+            "yyyy-MM-dd",
+            "EEEE, dd MMMM yyyy",
+            "dd MMM yyyy",
+            "dd/MM/yyyy",
+            "yyyy/MM/dd",
+            "dd-MM-yyyy"
+        )
+
+        /**
+         * Normalizes date strings across Web (`2026-10-31`) and Android (`31 October 2026`)
+         * into a canonical `yyyy-MM-dd` key for reliable cross-platform conflict checking.
+         */
+        fun normalizeDateKey(rawDate: String): String {
+            val clean = rawDate.trim()
+            if (clean.isEmpty()) return ""
+            val canonicalFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).apply {
+                isLenient = false
+            }
+            for (pattern in dateParsePatterns) {
+                try {
+                    val parser = SimpleDateFormat(pattern, Locale.ENGLISH).apply {
+                        isLenient = false
+                    }
+                    val parsed = parser.parse(clean)
+                    if (parsed != null) {
+                        return canonicalFormatter.format(parsed)
+                    }
+                } catch (_: Exception) {
+                }
+            }
+            return clean.lowercase(Locale.ENGLISH)
+        }
+
         fun fromJson(json: JSONObject): Booking {
             return Booking(
-                id = json.optString("id").ifBlank { json.optString("_id") },
-                clientId = json.optString("clientId"),
-                clientName = json.optString("clientName"),
-                clientEmail = json.optString("clientEmail"),
-                clientPhone = json.optString("clientPhone"),
-                serviceName = json.optString("serviceName"),
-                servicePrice = json.optInt("servicePrice", 0),
-                durationHours = json.optInt("durationHours", 1),
-                eventDate = json.optString("eventDate"),
-                eventTime = json.optString("eventTime"),
-                eventLocation = json.optString("eventLocation"),
-                requirements = json.optString("requirements"),
-                status = json.optString("status", "Pending"),
-                invoiceNumber = json.optString("invoiceNumber"),
-                invoiceStatus = json.optString("invoiceStatus", "Unpaid"),
-                createdAt = parseDate(json.optString("createdAt"))
+                id = json.optString("id").ifBlank { json.optString("RowKey").ifBlank { json.optString("_id") } },
+                clientId = json.optString("clientId").ifBlank { json.optString("ClientId") },
+                clientName = json.optString("clientName").ifBlank { json.optString("ClientName") },
+                clientEmail = json.optString("clientEmail").ifBlank { json.optString("ClientEmail") },
+                clientPhone = json.optString("clientPhone").ifBlank { json.optString("ClientPhone") },
+                serviceName = json.optString("serviceName").ifBlank { json.optString("ServiceName") },
+                servicePrice = if (json.has("servicePrice")) json.optInt("servicePrice", 0) else json.optInt("ServicePrice", 0),
+                durationHours = if (json.has("durationHours")) json.optInt("durationHours", 1) else json.optInt("DurationHours", 1),
+                eventDate = json.optString("eventDate").ifBlank { json.optString("EventDate") },
+                eventTime = json.optString("eventTime").ifBlank { json.optString("EventTime") },
+                eventLocation = json.optString("eventLocation").ifBlank { json.optString("EventLocation") },
+                requirements = json.optString("requirements").ifBlank { json.optString("Requirements") },
+                status = json.optString("status").ifBlank { json.optString("Status", "Pending") }.ifBlank { "Pending" },
+                invoiceNumber = json.optString("invoiceNumber").ifBlank { json.optString("InvoiceNumber") },
+                invoiceStatus = json.optString("invoiceStatus").ifBlank { json.optString("InvoiceStatus", "Unpaid") }.ifBlank { "Unpaid" },
+                createdAt = parseDate(json.optString("createdAt").ifBlank { json.optString("CreatedAt") })
             )
         }
     }
 }
 
-/** Invoice Entity (FR14, FR15, FR16, FR17). */
+/** Invoice Entity in Azure Table Storage `invoices` table (FR14, FR15, FR16, FR17). */
 data class Invoice(
     val invoiceId: String = "",
     val bookingId: String = "",
@@ -262,7 +319,7 @@ data class Invoice(
     val status: String = "Unpaid", // Unpaid, Partially Paid, Paid, Overdue
 )
 
-/** Azure Cosmos DB Document / API Entity in `enquiries` container. */
+/** Azure Table Storage Entity in `enquiries` table (`PartitionKey = "enquiry"`). */
 data class Enquiry(
     val id: String = "",
     val clientId: String = "",
@@ -287,20 +344,20 @@ data class Enquiry(
     companion object {
         fun fromJson(json: JSONObject): Enquiry {
             return Enquiry(
-                id = json.optString("id").ifBlank { json.optString("_id") },
-                clientId = json.optString("clientId"),
-                fullName = json.optString("fullName"),
-                email = json.optString("email"),
-                phone = json.optString("phone"),
-                message = json.optString("message"),
-                status = json.optString("status", "New"),
-                createdAt = parseDate(json.optString("createdAt"))
+                id = json.optString("id").ifBlank { json.optString("RowKey").ifBlank { json.optString("_id") } },
+                clientId = json.optString("clientId").ifBlank { json.optString("ClientId") },
+                fullName = json.optString("fullName").ifBlank { json.optString("FullName") },
+                email = json.optString("email").ifBlank { json.optString("Email") },
+                phone = json.optString("phone").ifBlank { json.optString("Phone") },
+                message = json.optString("message").ifBlank { json.optString("Message") },
+                status = json.optString("status").ifBlank { json.optString("Status", "New") }.ifBlank { "New" },
+                createdAt = parseDate(json.optString("createdAt").ifBlank { json.optString("CreatedAt") })
             )
         }
     }
 }
 
-/** Azure Cosmos DB Document / API Entity in `reviews` container. */
+/** Azure Table Storage Entity in `reviews` table (`PartitionKey = "review"`). */
 data class Review(
     val id: String = "",
     val authorName: String = "",
@@ -317,10 +374,10 @@ data class Review(
     companion object {
         fun fromJson(json: JSONObject): Review {
             return Review(
-                id = json.optString("id").ifBlank { json.optString("_id") },
-                authorName = json.optString("authorName"),
-                text = json.optString("text"),
-                createdAt = parseDate(json.optString("createdAt"))
+                id = json.optString("id").ifBlank { json.optString("RowKey").ifBlank { json.optString("_id") } },
+                authorName = json.optString("authorName").ifBlank { json.optString("ClientName") },
+                text = json.optString("text").ifBlank { json.optString("Comment") },
+                createdAt = parseDate(json.optString("createdAt").ifBlank { json.optString("CreatedAt") })
             )
         }
     }

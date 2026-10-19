@@ -28,6 +28,9 @@
     <string name="weddings_price">VANAF R1200 VIR 6 URE</string>
     <string name="events">GELEENTHEDE</string>
     <string name="events_price">R400 VIR 2 URE</string>
+    <string name="community_outreach_title">GEMEENSKAP &amp; NRO-UITREIK</string>
+    <string name="community_outreach_price">R200 VIR 2 URE (GESUBSIDIEERDE TARIEF)</string>
+    <string name="community_outreach_desc">Gesubsidieerde fotografie vir Strandfontein &amp; Kaapse Vlakte jeug-NRO\'s, liefdadigheidsorganisasies en matriekleerders.</string>
     <string name="book">BESPREEK</string>
 
     <!-- Booking -->

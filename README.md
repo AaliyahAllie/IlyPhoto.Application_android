@@ -1,26 +1,19 @@
-# IlyPhoto — Cross-Platform Photography Studio System
+# IlyPhoto — Cross-Platform Photography Studio & Community Outreach System
 
-[![Platform: Android](https://img.shields.io/badge/Platform-Android%20%7C%20Kotlin-brightgreen.svg)](https://developer.android.com)
-[![Platform: Web](https://img.shields.io/badge/Platform-ASP.NET%20Core%20%7C%20Web-blue.svg)](https://dotnet.microsoft.com)
-[![Cloud Backend: Azure](https://img.shields.io/badge/Backend-Microsoft%20Azure%20App%20Service-0078D4.svg)](https://azure.microsoft.com)
-[![Database: Azure Cloud](https://img.shields.io/badge/Database-Azure%20Table%20Storage%20%2F%20Cosmos%20DB-orange.svg)](https://azure.microsoft.com)
+[![Platform: Android](https://img.shields.com/badge/Platform-Android%20%7C%20Kotlin-brightgreen.svg)](https://developer.android.com)
+[![Platform: Web](https://img.shields.com/badge/Platform-ASP.NET%20Core%20%7C%20Web-blue.svg)](https://dotnet.microsoft.com)
+[![Cloud Backend: Azure](https://img.shields.com/badge/Backend-Microsoft%20Azure%20App%20Service-0078D4.svg)](https://azure.microsoft.com)
+[![Database: Azure Table Storage & Blob Storage](https://img.shields.com/badge/Database-Azure%20Table%20Storage%20%26%20Blob%20Storage-orange.svg)](https://azure.microsoft.com)
 
-**IlyPhoto** is a full-featured, cross-platform photography studio and client management system. It enables photographers to showcase their portfolio, manage bookings and invoices, and handle customer enquiries and reviews, while providing clients with a seamless booking and review experience across mobile (Android) and web.
-
-All platforms connect to a unified **Microsoft Azure Cloud Backend**, ensuring real-time data synchronization across every device.
+**IlyPhoto** is a cross-platform photography booking, client gallery, invoicing, and community outreach system built for **ILY Photo Studio** (owned by **Aysha Allie**, 8 Green Way, Strandfontein, Cape Town). All platforms (Android Native App and ASP.NET Core Web Portal) connect to a unified **Microsoft Azure App Service REST API**, **Azure Table Storage**, and **Azure Blob Storage** backend.
 
 ---
 
-## 🌟 Key Features
+## 🤝 Strandfontein Community & NGO Social Impact
 
-- **Cross-Platform Synchronization**: Instant synchronization across Android mobile and Web applications via Azure Cloud.
-- **Unified Authentication**: Secure authentication for both Clients and Photographers/Admins.
-- **Interactive Portfolio & Gallery**: Browse high-resolution photography categorized by Wedding, Portrait, Events, and Commercial.
-- **Booking & Scheduling**: Reserve photography sessions, choose package types, and track booking statuses in real time.
-- **Automated Invoicing & Pricing**: Automatic calculation of totals, invoice generation, and status tracking (`Unpaid`, `Paid`).
-- **Client Reviews & Ratings**: Submit star ratings and customer testimonials.
-- **Direct Enquiries**: Client contact inquiries with tracking statuses.
-- **Resilient Offline Fallback**: Cached sessions and graceful degradation when offline.
+Rooted in Strandfontein and the Cape Flats, **ILY Photo** addresses a direct community and NGO need alongside its commercial studio packages:
+- **Subsidised Youth & Matric Farewell Photography**: Under-resourced Matric learners referred by local high schools and youth development NGOs can book the **Community & NGO Outreach** package (`R200 for 2 Hours`) so financial barriers do not prevent learners from celebrating milestone achievements.
+- **NGO & Charity Event Documentation**: Registered non-profit organisations, soup kitchens, and faith-based community programmes across Strandfontein and Mitchells Plain use the platform to book event coverage and receive cloud-hosted Azure Blob galleries for donor reporting and community storytelling.
 
 ---
 
@@ -40,7 +33,7 @@ All platforms connect to a unified **Microsoft Azure Cloud Backend**, ensuring r
                  └────────────┬────────────┘    └────────────┬────────────┘
                               │                              │
                               └──────────────┬───────────────┘
-                                             │ HTTPS
+                                             │ HTTPS (Bearer Token)
                                              ▼
                                 ┌───────────────────────────┐
                                 │     Azure REST Backend    │
@@ -50,79 +43,64 @@ All platforms connect to a unified **Microsoft Azure Cloud Backend**, ensuring r
                       ┌───────────────────────┴───────────────────────┐
                       ▼                                               ▼
        ┌─────────────────────────────┐                 ┌─────────────────────────────┐
-       │     Azure Cloud Database    │                 │     Azure Blob Storage      │
-       │ Azure Table Storage/Cosmos  │                 │   High-Res Galleries &      │
-       │  (users, bookings, photos,  │                 │   Portfolio Asset Store     │
-       │    enquiries, reviews)      │                 │                             │
+       │     Azure Table Storage     │                 │     Azure Blob Storage      │
+       │  (`Users`, `Bookings`,      │                 │   Container:                │
+       │   `Invoices`, `Galleries`,  │                 │   `ilyphoto-galleries`      │
+       │   `Photos`, `Services`,     │                 │   (High-Res Client Albums   │
+       │   `Enquiries`, `Reviews`,   │                 │    & SAS-Protected Assets)  │
+       │   `BlockedDates`)           │                 │                             │
        └─────────────────────────────┘                 └─────────────────────────────┘
 ```
 
 ---
 
-## 📁 Repository Structure
+## 🗄️ Cloud Database Schema, Table Keys, Client Links & Integrity Rules
 
-```text
-IlyPhoto/
-├── app/                            # Android Application (Kotlin, Jetpack, Coroutines)
-│   ├── src/main/java/com/example/ilyphoto/
-│   │   ├── data/                   # Azure repositories, models & API clients
-│   │   │   ├── AzureApiClient.kt   # REST client communicating with Azure Cloud
-│   │   │   ├── AzureConfig.kt      # Cloud endpoints and container configurations
-│   │   │   ├── AzureProvider.kt    # Token and session state manager
-│   │   │   ├── Models.kt           # Shared cross-platform domain entities
-│   │   │   └── ServiceLocator.kt   # Dependency injection container
-│   │   └── ...                     # Android UI fragments, navigation, view models
-│   └── build.gradle.kts            # Android build dependencies
-├── build.gradle.kts                # Project-level Gradle build configuration
-├── .gitignore                      # Git ignore rules for Android Studio & build files
-└── README.md                       # Complete documentation
+All structured records are stored in **Azure Table Storage** (`ilyphotostorage`), while binary high-resolution photographs are stored in **Azure Blob Storage** (`ilyphoto-galleries`).
+
+### 1. Azure Table Storage Keys (`PartitionKey` & `RowKey`)
+
+| Table Name | `PartitionKey` | `RowKey` (Primary Key) | Foreign Key / Client Link | Description |
+|---|---|---|---|---|
+| `Users` | `"USER"` (`CLIENT` / `ADMIN` role) | `UserId` / `ClientId` (e.g. `CL-1001`) | Primary Client Identity (`ClientId`, `Email`) | Authenticated client & photographer profiles |
+| `Bookings` | `"BOOKING"` | `BookingId` (e.g. `BK-2001`) | `ClientId` (`CL-xxxx`) + `ClientEmail` | Photoshoot date, time, venue, package, duration, price, and status |
+| `Invoices` | `"INVOICE"` | `InvoiceNumber` (e.g. `INV-2001`) | `BookingId` (`BK-xxxx`) + `ClientId` (`CL-xxxx`) | Line items, total amount due, EFT reference, and payment status |
+| `Galleries` | `"GALLERY"` | `GalleryId` (e.g. `GAL-3001`) | `ClientId` (`CL-xxxx`) + `BookingId` (`BK-xxxx`) | Private client photo albums linked to Azure Blob URLs |
+| `Photos` | `"PHOTO"` | `PhotoId` (UUID) | `ClientId` + `StoragePath` (Blob URI) | Individual gallery/portfolio photo metadata and Blob SAS URLs |
+| `Services` | `"SERVICE"` | `ServiceId` (`SVC-01`..`SVC-05`) |Referenced by `Bookings.ServiceName` | Studio & NGO Outreach photography packages |
+| `Enquiries` | `"ENQUIRY"` | `EnquiryId` (`ENQ-xxxx`) | `ClientId` + `Email` | Client contact messages and photographer responses |
+| `Reviews` | `"REVIEW"` | `ReviewId` (`ClientId`) | `ClientId` (1 review per client) | Verified client testimonials |
+| `BlockedDates` | `"BLOCKED"` | `NormalizedDateKey` (`yyyy-MM-dd`) | Created by Photographer | Unavailable studio dates |
+
+### 2. Referential Links & Data Integrity Rules
+
+1. **Client-Scoped Isolation (`ClientId` Link)**:
+   - Every `Booking`, `Invoice`, and `Gallery`/`Photo` record stores the owning client's `ClientId` (`CL-xxxx`), `Uid`, and `ClientEmail`.
+   - On Android, `UserProfile.matchesBooking()` and `UserProfile.matchesPhoto()` enforce strict client scoping so clients can only view, reschedule, or download their own records.
+2. **Authoritative Cloud Availability & Conflict Prevention**:
+   - Before displaying availability or submitting a new/rescheduled booking, `BookingRepository.checkAvailability()`, `createBooking()`, and `updateBooking()` always call `fetchLatestBookings()` from Azure Table Storage first (never relying on stale local cache).
+   - `Booking.normalizeDateKey()` normalizes dates across Android (`"04 September 2026"`) and Web (`"2026-09-04"`) into ISO `yyyy-MM-dd` format so cross-platform bookings on the same date are accurately detected.
+   - Cancelled and Rejected bookings release their date reservation; Paid bookings cannot be cancelled via the client app.
+3. **Full Cross-Device Rescheduling Persistence**:
+   - Amending or rescheduling a booking on mobile invokes `AzureApiClient.updateBooking(booking)`, persisting all amended fields (`serviceName`, `servicePrice`, `durationHours`, `eventDate`, `eventTime`, `eventLocation`, `requirements`, `clientPhone`, and `status = "Rescheduled"`) to Azure Table Storage before updating local state.
+4. **Authentication & Session Protection**:
+   - `AuthRepository.signIn()` validates credentials strictly against `POST /api/auth/login` over HTTPS and rejects failed authentication without falling back to cached profiles.
+   - `AzureProvider` validates token structure, rejects placeholder offline tokens, enforces a 24-hour session TTL, and verifies a SHA-256 session integrity signature (`KEY_SESSION_SIGNATURE`) before restoring a cached session.
+5. **Accurate Error Propagation**:
+   - Registration (`AuthRepository.register`), password recovery (`AuthRepository.sendPasswordReset`), profile saves (`AuthRepository.updateProfileDetails`), and booking writes (`BookingRepository`) verify cloud persistence before reporting success and surface descriptive user-facing errors on failure.
+
+---
+
+## 🧪 Running Unit Tests & Building the App
+
+Run the automated JUnit test suite (covering booking conflict detection, cross-platform date normalization, full rescheduling field persistence, cloud-first availability checks, authentication rejection on invalid password even when a cached profile exists, and error propagation for failed registration/reset/save requests):
+
+```bash
+./gradlew testDebugUnitTest
 ```
 
----
+Build the debug APK:
 
-## 🚀 Getting Started
-
-### 1. Prerequisites
-
-- **Java JDK**: Version 17 or higher
-- **Android Studio**: Ladybug / Hedgehog or newer (with Android SDK 34+)
-- **Android Device or Emulator**: Android 8.0 (API level 26) or higher
-
-### 2. Building & Running the Android App
-
-1. Clone or open the `IlyPhoto` directory in **Android Studio**:
-   ```bash
-   cd IlyPhoto
-   ```
-2. Allow Gradle to sync dependencies.
-3. Build the project using Gradle:
-   ```bash
-   ./gradlew assembleDebug
-   ```
-4. Run the application on an Android device or emulator from Android Studio by selecting **Run > Run 'app'** (`Shift + F10`).
-
----
-
-## ☁️ Azure Cloud Backend & Database
-
-The backend services are hosted on **Microsoft Azure**:
-
-- **Azure App Service**: `https://ilyphoto-api-st10212542.azurewebsites.net`
-- **Azure Storage Account**: `ilyphotostorage`
-  - **Tables**: `users`, `bookings`, `galleries`, `services`, `invoices`, `enquiries`, `reviews`
-  - **Blob Containers**: `ilyphoto-galleries` (client galleries and portfolios)
-
-### Core REST Endpoints:
-
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/health` | GET | System health check and storage status |
-| `/api/auth/register` | POST | Register a new client account |
-| `/api/auth/login` | POST | Client and Photographer authentication |
-| `/api/auth/me` | GET | Retrieve authenticated profile |
-| `/api/auth/profile` | PUT | Update profile contact details & photo |
-| `/api/bookings` | GET, POST | Retrieve and submit photoshoot bookings |
-| `/api/bookings/{id}/status` | PATCH | Update booking status (`Confirmed`, `Pending`, etc.) |
-| `/api/photos` | GET, POST | Retrieve portfolio gallery photos |
-| `/api/enquiries` | GET, POST | Submit client inquiries |
-| `/api/reviews` | GET, POST | Submit and view client reviews & ratings |
+```bash
+./gradlew assembleDebug
+```

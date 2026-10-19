@@ -3,7 +3,7 @@ package com.example.ilyphoto
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.net.Uri
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
@@ -15,9 +15,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.ilyphoto.config.BusinessConfig
+import com.example.ilyphoto.data.AzureProvider
 import com.example.ilyphoto.data.Booking
 import com.example.ilyphoto.data.ServiceLocator
 import com.example.ilyphoto.data.UserRole
+import com.example.ilyphoto.data.toUserMessage
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -25,8 +27,6 @@ class InvoiceFragment : Fragment(R.layout.fragment_invoice) {
 
     private var currentBooking: Booking? = null
     private var userBookingsList: List<Booking> = emptyList()
-    private var lastKnownStatus: String? = null
-    private var lastKnownPaymentStatus: String? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -69,8 +69,8 @@ class InvoiceFragment : Fragment(R.layout.fragment_invoice) {
 
         // Set business info
         tvStudioInfo?.text = "${BusinessConfig.BUSINESS_NAME} • ${BusinessConfig.OWNER_NAME}\n" +
-                "${BusinessConfig.BUSINESS_ADDRESS}\n" +
-                "${BusinessConfig.CONTACT_PHONE} • ${BusinessConfig.CONTACT_EMAIL}"
+            "${BusinessConfig.BUSINESS_ADDRESS}\n" +
+            "${BusinessConfig.CONTACT_PHONE} • ${BusinessConfig.CONTACT_EMAIL}"
 
         // Strictly restrict "Record Payment" to Admin/Photographer only
         viewLifecycleOwner.lifecycleScope.launch {
@@ -87,9 +87,10 @@ class InvoiceFragment : Fragment(R.layout.fragment_invoice) {
             val invoiceHeader = if (userBookingsList.size > 1) "$invNum (Tap to switch)" else invNum
             tvInvoiceNumber?.text = invoiceHeader
 
-            // Configure status badge
+            // Configure status badge with high-contrast white text
             val status = activeBooking.invoiceStatus.ifBlank { "Unpaid" }
             tvStatusBadge?.text = status.uppercase()
+            tvStatusBadge?.setTextColor(Color.WHITE)
             when (status.lowercase()) {
                 "paid" -> tvStatusBadge?.setBackgroundResource(R.drawable.badge_paid)
                 "partially paid" -> tvStatusBadge?.setBackgroundResource(R.drawable.badge_partially_paid)
@@ -113,31 +114,24 @@ class InvoiceFragment : Fragment(R.layout.fragment_invoice) {
 
             // Bank Details
             tvBankInfo?.text = "Bank: ${BusinessConfig.bank.bankName}\n" +
-                    "Account Holder: ${BusinessConfig.bank.accountHolder}\n" +
-                    "Account No: ${BusinessConfig.bank.accountNumber}\n" +
-                    "Branch Code: ${BusinessConfig.bank.branchCode}\n" +
-                    "Reference: $invNum"
-
-            // Auto status update notifications
-            if (lastKnownPaymentStatus != null && lastKnownPaymentStatus != activeBooking.invoiceStatus) {
-                IlyNotificationHelper.notifyPaymentReceived(requireContext(), invNum, activeBooking.invoiceStatus)
-            }
-            if (lastKnownStatus != null && lastKnownStatus != activeBooking.status) {
-                IlyNotificationHelper.notifyBookingStatus(requireContext(), activeBooking.serviceName, activeBooking.status)
-            }
-            lastKnownPaymentStatus = activeBooking.invoiceStatus
-            lastKnownStatus = activeBooking.status
+                "Account Holder: ${BusinessConfig.bank.accountHolder}\n" +
+                "Account No: ${BusinessConfig.bank.accountNumber}\n" +
+                "Branch Code: ${BusinessConfig.bank.branchCode}\n" +
+                "Reference: $invNum"
         }
 
-        val currentUid = ServiceLocator.auth.currentUserSnapshot()?.uid
         viewLifecycleOwner.lifecycleScope.launch {
             ServiceLocator.bookings.bookings().collectLatest { allBookings ->
-                val profile = ServiceLocator.auth.currentUser
-                val userBookings = if (!currentUid.isNullOrEmpty()) {
-                    allBookings.filter { it.clientId == currentUid }
-                } else {
-                    emptyList()
+                val currentProfile = ServiceLocator.auth.currentUserSnapshot()
+                    ?: AzureProvider.getCachedProfile()
+                val userBookings = when {
+                    currentProfile == null -> emptyList()
+                    currentProfile.role == UserRole.PHOTOGRAPHER -> allBookings
+                    else -> allBookings.filter { currentProfile.matchesBooking(it) }
                 }
+
+                // Trigger reliable push notifications on status/invoice changes
+                IlyNotificationHelper.checkAndNotifyBookingChanges(requireContext(), userBookings)
 
                 userBookingsList = userBookings
 
@@ -180,10 +174,10 @@ class InvoiceFragment : Fragment(R.layout.fragment_invoice) {
             val booking = currentBooking
             val ref = booking?.invoiceNumber?.ifBlank { "INV-ILY" } ?: "INV-ILY"
             val textToCopy = "Bank: ${BusinessConfig.bank.bankName}\n" +
-                    "Account: ${BusinessConfig.bank.accountHolder}\n" +
-                    "Account No: ${BusinessConfig.bank.accountNumber}\n" +
-                    "Branch: ${BusinessConfig.bank.branchCode}\n" +
-                    "Reference: $ref"
+                "Account: ${BusinessConfig.bank.accountHolder}\n" +
+                "Account No: ${BusinessConfig.bank.accountNumber}\n" +
+                "Branch: ${BusinessConfig.bank.branchCode}\n" +
+                "Reference: $ref"
 
             val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Ily Photo Bank Details", textToCopy)
@@ -235,8 +229,25 @@ class InvoiceFragment : Fragment(R.layout.fragment_invoice) {
                     }
 
                     viewLifecycleOwner.lifecycleScope.launch {
-                        ServiceLocator.bookings.updateInvoiceStatus(booking, newStatus)
-                        Toast.makeText(requireContext(), "Invoice marked as $newStatus!", Toast.LENGTH_SHORT).show()
+                        val result = ServiceLocator.bookings.updateInvoiceStatus(booking, newStatus)
+                        result.onSuccess {
+                            IlyNotificationHelper.notifyPaymentReceived(
+                                requireContext(),
+                                booking.invoiceNumber.ifBlank { booking.id },
+                                newStatus
+                            )
+                            Toast.makeText(
+                                requireContext(),
+                                "Invoice marked as $newStatus in Azure Cloud!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }.onFailure { err ->
+                            Toast.makeText(
+                                requireContext(),
+                                err.toUserMessage(),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 }
                 .setNegativeButton("Cancel", null)

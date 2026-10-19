@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.ilyphoto.data.ServiceLocator
 import com.example.ilyphoto.data.UserProfile
+import com.example.ilyphoto.data.toUserMessage
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -29,15 +30,31 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     ProfileAvatarHelper.saveAndUploadAvatar(requireContext(), uri, prof) { success ->
                         if (success) {
-                            ProfileAvatarHelper.loadAvatar(requireContext(), ivProfileAvatar, prof)
-                            Toast.makeText(requireContext(), "Profile picture saved to your account in database!", Toast.LENGTH_SHORT).show()
+                            ProfileAvatarHelper.loadAvatar(
+                                requireContext(),
+                                ivProfileAvatar,
+                                ServiceLocator.auth.currentUserSnapshot() ?: prof
+                            )
+                            Toast.makeText(
+                                requireContext(),
+                                "Profile picture saved to Azure Table Storage!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         } else {
-                            Toast.makeText(requireContext(), "Could not save profile picture", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "Could not save profile picture to cloud database.",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                 }
             } else {
-                ivProfileAvatar?.setImageURI(uri)
+                Toast.makeText(
+                    requireContext(),
+                    "Please sign in before updating your profile picture.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -61,7 +78,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
         ivProfileAvatar = profileAvatar
 
-        // Live observation of user profile from Azure Cloud Database (including client-linked photoUrl)
+        // Live observation of user profile from Azure Table Storage (including client-linked photoUrl)
         viewLifecycleOwner.lifecycleScope.launch {
             ServiceLocator.auth.currentUser.collectLatest { profile ->
                 if (profile != null) {
@@ -93,24 +110,54 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         btnEditAvatar?.setOnClickListener(avatarClickListener)
 
         btnSaveProfile?.setOnClickListener {
-            val prof = currentProfile
-            val updatedName = "${etFirstName?.text?.toString()?.trim()} ${etLastName?.text?.toString()?.trim()}".trim()
+            val prof = currentProfile ?: ServiceLocator.auth.currentUserSnapshot()
+            val firstName = etFirstName?.text?.toString()?.trim().orEmpty()
+            val lastName = etLastName?.text?.toString()?.trim().orEmpty()
+            val updatedName = "$firstName $lastName".trim()
             val updatedPhone = etPhone?.text?.toString()?.trim().orEmpty()
 
-            if (prof != null) {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    ServiceLocator.auth.updateProfileDetails(
-                        current = prof,
-                        displayName = updatedName.ifBlank { prof.displayName },
-                        username = prof.username,
-                        phone = updatedPhone,
-                        address = prof.address,
-                        role = prof.role
-                    )
-                    Toast.makeText(requireContext(), "Profile changes saved successfully!", Toast.LENGTH_SHORT).show()
+            if (prof == null) {
+                Toast.makeText(
+                    requireContext(),
+                    "Please sign in first to save profile changes.",
+                    Toast.LENGTH_LONG
+                ).show()
+                return@setOnClickListener
+            }
+
+            if (updatedName.isBlank()) {
+                Toast.makeText(
+                    requireContext(),
+                    "Please enter your name before saving.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            btnSaveProfile.isEnabled = false
+            viewLifecycleOwner.lifecycleScope.launch {
+                val result = ServiceLocator.auth.updateProfileDetails(
+                    current = prof,
+                    displayName = updatedName,
+                    username = prof.username,
+                    phone = updatedPhone,
+                    address = prof.address,
+                    role = prof.role
+                )
+                btnSaveProfile.isEnabled = true
+                result.onSuccess {
+                    Toast.makeText(
+                        requireContext(),
+                        "Profile changes saved to Azure Cloud!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }.onFailure { err ->
+                    Toast.makeText(
+                        requireContext(),
+                        err.toUserMessage(),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-            } else {
-                Toast.makeText(requireContext(), "Profile changes saved locally!", Toast.LENGTH_SHORT).show()
             }
         }
 

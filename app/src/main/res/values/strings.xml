@@ -4,7 +4,7 @@
     <string name="ily_photo_title">ILY PHOTO.</string>
     <string name="capturing_every_moment">CAPTURING EVERY MOMENT</string>
     <string name="upcoming_event">UPCOMING EVENT</string>
-    <string name="sample_booking">BOOKING: 04 SEPETEMBER</string>
+    <string name="sample_booking">BOOKING: 04 SEPTEMBER</string>
     <string name="more">MORE</string>
     <string name="view_bookings">VIEW BOOKINGS</string>
     <string name="search">Search</string>
@@ -27,6 +27,9 @@
     <string name="weddings_price">FROM R1200 FOR 6 HOURS</string>
     <string name="events">EVENTS</string>
     <string name="events_price">R400 FOR 2 HOURS</string>
+    <string name="community_outreach_title">COMMUNITY &amp; NGO OUTREACH</string>
+    <string name="community_outreach_price">R200 FOR 2 HOURS (SUBSIDISED RATE)</string>
+    <string name="community_outreach_desc">Subsidised photography for Strandfontein &amp; Cape Flats youth NGOs, registered charities, and under-resourced Matric learners.</string>
     <string name="book">BOOK</string>
 
     <!-- Booking -->
@@ -81,7 +84,7 @@
     <string name="password_weak">Weak: Needs 8+ chars, upper, lower, number, symbol</string>
     <string name="password_moderate">Moderate: Almost there! Add missing characters</string>
     <string name="password_strong">Strong Password ✓</string>
-    <string name="cape_town_disclaimer">📍 Note: Photographer operates in and around Cape Town only.</string>
+    <string name="cape_town_disclaimer">📍 Note: Photographer operates in and around Cape Town (Strandfontein &amp; surrounds).</string>
     <string name="sign_up">Sign Up</string>
     <string name="login">Login</string>
     <string name="register">Register</string>

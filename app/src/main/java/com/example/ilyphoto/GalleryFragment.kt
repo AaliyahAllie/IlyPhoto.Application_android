@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.ilyphoto.data.AzureProvider
 import com.example.ilyphoto.data.Photo
 import com.example.ilyphoto.data.ServiceLocator
 import kotlinx.coroutines.flow.collectLatest
@@ -113,23 +114,24 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
             }.collectLatest { (currentProfile, allPhotos, allBookings) ->
                 layoutGalleryContent?.removeAllViews()
 
-                if (currentProfile == null) {
+                val baseProfile = currentProfile ?: AzureProvider.getCachedProfile()
+                if (baseProfile == null) {
                     cardEmptyGallery?.visibility = View.VISIBLE
                     btnDownloadGallery?.visibility = View.GONE
                     return@collectLatest
                 }
 
                 // If profile clientId is missing, resolve it from the user's bookings
-                val resolvedClientId = if (currentProfile.clientId.isNotBlank()) {
-                    currentProfile.clientId
+                val resolvedClientId = if (baseProfile.clientId.isNotBlank()) {
+                    baseProfile.clientId
                 } else {
-                    allBookings.firstOrNull { currentProfile.matchesBooking(it) }?.clientId.orEmpty()
+                    allBookings.firstOrNull { baseProfile.matchesBooking(it) }?.clientId.orEmpty()
                 }
 
-                val activeProfile = if (resolvedClientId.isNotBlank() && currentProfile.clientId.isBlank()) {
-                    currentProfile.copy(clientId = resolvedClientId)
+                val activeProfile = if (resolvedClientId.isNotBlank() && baseProfile.clientId.isBlank()) {
+                    baseProfile.copy(clientId = resolvedClientId)
                 } else {
-                    currentProfile
+                    baseProfile
                 }
 
                 // Strictly filter photos belonging ONLY to this client's account

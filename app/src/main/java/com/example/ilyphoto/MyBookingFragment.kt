@@ -1,8 +1,6 @@
 package com.example.ilyphoto
 
-import android.content.Context
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,14 +13,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.example.ilyphoto.data.Booking
+import com.example.ilyphoto.data.AzureProvider
 import com.example.ilyphoto.data.ServiceLocator
+import com.example.ilyphoto.data.UserRole
+import com.example.ilyphoto.data.toUserMessage
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MyBookingFragment : Fragment(R.layout.fragment_my_booking) {
-
-    private val previousStatusMap = mutableMapOf<String, String>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,24 +47,24 @@ class MyBookingFragment : Fragment(R.layout.fragment_my_booking) {
         val navMenu = view.findViewById<FrameLayout>(R.id.navMenu)
 
         val inflater = LayoutInflater.from(requireContext())
-        // Live observation of bookings saved in Azure Cosmos DB - strictly scoped to this user
+        // Live observation of bookings saved in Azure Table Storage - scoped to this user
         viewLifecycleOwner.lifecycleScope.launch {
             ServiceLocator.bookings.bookings().collectLatest { bookingList ->
                 val currentProfile = ServiceLocator.auth.currentUserSnapshot()
-                val userBookings = if (currentProfile != null) {
-                    bookingList.filter { currentProfile.matchesBooking(it) }
-                } else {
-                    emptyList()
+                    ?: AzureProvider.getCachedProfile()
+                val authToken = AzureProvider.authToken.orEmpty().trim()
+                val userBookings = when {
+                    currentProfile?.role == UserRole.PHOTOGRAPHER -> bookingList
+                    currentProfile != null -> bookingList.filter { currentProfile.matchesBooking(it) }
+                    authToken.isNotBlank() -> bookingList.filter {
+                        it.clientEmail.equals(authToken, ignoreCase = true) ||
+                            it.clientId.equals(authToken, ignoreCase = true)
+                    }
+                    else -> bookingList
                 }
 
-                // Check for live status updates from admin/photographer
-                for (booking in userBookings) {
-                    val prevStatus = previousStatusMap[booking.id]
-                    if (prevStatus != null && prevStatus != booking.status) {
-                        IlyNotificationHelper.notifyBookingStatus(requireContext(), booking.serviceName, booking.status)
-                    }
-                    previousStatusMap[booking.id] = booking.status
-                }
+                // Trigger reliable push notifications on status or payment updates from Azure
+                IlyNotificationHelper.checkAndNotifyBookingChanges(requireContext(), userBookings)
 
                 // Remove previously inflated dynamic booking cards, keeping the empty state view
                 val viewsToRemove = mutableListOf<View>()
@@ -98,50 +96,56 @@ class MyBookingFragment : Fragment(R.layout.fragment_my_booking) {
 
                         val bookingStatus = booking.status.ifBlank { "Pending" }
                         val isCancelled = bookingStatus.equals("Cancelled", ignoreCase = true)
-                        val isApproved = bookingStatus.equals("Approved", ignoreCase = true) || bookingStatus.equals("Confirmed", ignoreCase = true)
+                        val isRescheduled = bookingStatus.equals("Rescheduled", ignoreCase = true)
+                        val isApproved = bookingStatus.equals("Approved", ignoreCase = true) ||
+                            bookingStatus.equals("Confirmed", ignoreCase = true)
                         val isPaid = booking.invoiceStatus.equals("Paid", ignoreCase = true)
                         val isPartial = booking.invoiceStatus.contains("Partial", ignoreCase = true)
+                        val displayTime = booking.eventTime.ifBlank { "14:00" }
 
                         tvSubtitle?.text = "STATUS: ${bookingStatus.uppercase()}"
-                        tvBookingDate?.text = "BOOKING: ${booking.eventDate.uppercase()}"
+                        tvBookingDate?.text = "BOOKING: ${booking.eventDate.uppercase()} • $displayTime"
                         tvEventType?.text = booking.serviceName
                         tvLocation?.text = booking.eventLocation.ifEmpty { "Strandfontein, Cape Town" }
                         tvPrice?.text = "R${booking.servicePrice}.00 (${booking.durationHours} Hours)"
                         tvPaymentDetails?.text = "${booking.invoiceStatus} (${booking.invoiceNumber})"
 
+                        // High-contrast white text on all solid status badges
+                        tvStatusBadge?.setTextColor(Color.WHITE)
                         when {
                             isCancelled -> {
                                 tvStatusBadge?.text = "CANCELLED"
                                 tvStatusBadge?.setBackgroundResource(R.drawable.badge_cancelled)
-                                tvStatusBadge?.setTextColor(Color.parseColor("#FFFFFF"))
                                 btnCancel?.visibility = View.GONE
                                 btnEdit?.visibility = View.GONE
                             }
                             isApproved -> {
                                 tvStatusBadge?.text = "APPROVED"
                                 tvStatusBadge?.setBackgroundResource(R.drawable.badge_paid)
-                                tvStatusBadge?.setTextColor(Color.parseColor("#2E7D32"))
                                 btnCancel?.visibility = View.GONE
                                 btnEdit?.visibility = View.VISIBLE
                             }
                             isPaid -> {
                                 tvStatusBadge?.text = "PAID"
                                 tvStatusBadge?.setBackgroundResource(R.drawable.badge_paid)
-                                tvStatusBadge?.setTextColor(Color.parseColor("#2E7D32"))
                                 btnCancel?.visibility = View.GONE
                                 btnEdit?.visibility = View.VISIBLE
                             }
                             isPartial -> {
                                 tvStatusBadge?.text = "DEPOSIT PAID"
                                 tvStatusBadge?.setBackgroundResource(R.drawable.badge_partially_paid)
-                                tvStatusBadge?.setTextColor(Color.parseColor("#E65100"))
                                 btnCancel?.visibility = View.GONE
+                                btnEdit?.visibility = View.VISIBLE
+                            }
+                            isRescheduled -> {
+                                tvStatusBadge?.text = "RESCHEDULED"
+                                tvStatusBadge?.setBackgroundResource(R.drawable.badge_pending)
+                                btnCancel?.visibility = View.VISIBLE
                                 btnEdit?.visibility = View.VISIBLE
                             }
                             else -> {
                                 tvStatusBadge?.text = "PENDING APPROVAL"
                                 tvStatusBadge?.setBackgroundResource(R.drawable.badge_unpaid)
-                                tvStatusBadge?.setTextColor(Color.parseColor("#C62828"))
                                 btnCancel?.visibility = View.VISIBLE
                                 btnEdit?.visibility = View.VISIBLE
                             }
@@ -171,6 +175,11 @@ class MyBookingFragment : Fragment(R.layout.fragment_my_booking) {
                                     viewLifecycleOwner.lifecycleScope.launch {
                                         val result = ServiceLocator.bookings.cancelBooking(booking)
                                         result.onSuccess {
+                                            IlyNotificationHelper.notifyBookingStatus(
+                                                requireContext(),
+                                                booking.serviceName,
+                                                "Cancelled"
+                                            )
                                             Toast.makeText(
                                                 requireContext(),
                                                 "Booking for ${booking.eventDate} has been cancelled.",
@@ -179,7 +188,7 @@ class MyBookingFragment : Fragment(R.layout.fragment_my_booking) {
                                         }.onFailure { err ->
                                             Toast.makeText(
                                                 requireContext(),
-                                                err.message ?: "Failed to cancel booking",
+                                                err.toUserMessage(),
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }

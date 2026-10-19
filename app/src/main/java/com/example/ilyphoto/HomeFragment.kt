@@ -1,7 +1,6 @@
 package com.example.ilyphoto
 
-import android.content.Context
-import android.net.Uri
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +8,10 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.example.ilyphoto.data.Booking
+import com.example.ilyphoto.data.AzureProvider
 import com.example.ilyphoto.data.ServiceLocator
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -61,10 +59,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         viewLifecycleOwner.lifecycleScope.launch {
             ServiceLocator.bookings.bookings().collectLatest { allBookings ->
                 val currentProfile = ServiceLocator.auth.currentUserSnapshot()
+                    ?: AzureProvider.getCachedProfile()
                 val userBookings = if (currentProfile != null) {
                     allBookings.filter { currentProfile.matchesBooking(it) }
                 } else {
                     allBookings
+                }
+
+                // Dispatch notifications whenever status or invoice status updates in Azure
+                if (currentProfile != null) {
+                    IlyNotificationHelper.checkAndNotifyBookingChanges(requireContext(), userBookings)
                 }
 
                 // Filter for upcoming (non-cancelled or active bookings)
@@ -104,18 +108,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
                         tvUpcomingServiceName?.text = booking.serviceName.ifBlank { "Photoshoot Session" }
 
-                        // Status Badge formatting
+                        // Status Badge formatting with high-contrast white text
                         val status = booking.status.ifBlank { "Pending" }
                         tvUpcomingStatusBadge?.text = status.uppercase()
+                        tvUpcomingStatusBadge?.setTextColor(Color.WHITE)
                         when (status.lowercase()) {
-                            "approved", "confirmed" -> {
+                            "approved", "confirmed", "completed" -> {
                                 tvUpcomingStatusBadge?.setBackgroundResource(R.drawable.badge_paid)
                             }
-                            "pending" -> {
+                            "pending", "rescheduled" -> {
                                 tvUpcomingStatusBadge?.setBackgroundResource(R.drawable.badge_pending)
-                            }
-                            "completed" -> {
-                                tvUpcomingStatusBadge?.setBackgroundResource(R.drawable.badge_paid)
                             }
                             else -> {
                                 tvUpcomingStatusBadge?.setBackgroundResource(R.drawable.badge_cancelled)

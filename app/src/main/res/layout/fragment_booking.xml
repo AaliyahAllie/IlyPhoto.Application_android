@@ -83,6 +83,7 @@
         android:text="@string/booking"
         android:textColor="@color/white"
         android:textSize="17sp"
+        android:textStyle="bold"
         android:letterSpacing="0.06"
         android:fontFamily="sans-serif"
         android:paddingTop="12dp"
@@ -109,6 +110,7 @@
         android:text="@string/capturing_every_moment"
         android:textColor="@color/white"
         android:textSize="14sp"
+        android:textStyle="bold"
         android:letterSpacing="0.06"
         android:fontFamily="sans-serif"
         android:layout_marginTop="14dp"
@@ -145,6 +147,7 @@
                 android:text="@string/select_a_date"
                 android:textColor="@color/white"
                 android:textSize="15sp"
+                android:textStyle="bold"
                 android:fontFamily="sans-serif-medium"
                 android:layout_marginBottom="6dp" />
 
@@ -179,7 +182,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="2026"
-                            android:textColor="#C5D7FF"
+                            android:textColor="#E2ECFF"
+                            android:textStyle="bold"
                             android:textSize="13sp" />
 
                         <TextView
@@ -205,7 +209,7 @@
                             android:layout_height="wrap_content"
                             android:text="PHOTOSHOOT DATE (ACCURATE CALENDAR):"
                             android:textColor="@color/brand_text_dark"
-                            android:textSize="12sp"
+                            android:textSize="13sp"
                             android:textStyle="bold"
                             android:letterSpacing="0.04" />
 
@@ -237,14 +241,14 @@
 
                             <TextView
                                 android:layout_width="wrap_content"
-                                android:layout_height="32dp"
+                                android:layout_height="34dp"
                                 android:background="@drawable/login_button_background"
                                 android:gravity="center"
                                 android:paddingStart="14dp"
                                 android:paddingEnd="14dp"
                                 android:text="CHANGE"
                                 android:textColor="#FFFFFF"
-                                android:textSize="12sp"
+                                android:textSize="13sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
@@ -254,7 +258,7 @@
                             android:layout_height="wrap_content"
                             android:text="SESSION TIME:"
                             android:textColor="@color/brand_text_dark"
-                            android:textSize="12sp"
+                            android:textSize="13sp"
                             android:textStyle="bold"
                             android:letterSpacing="0.04"
                             android:layout_marginTop="14dp" />
@@ -286,14 +290,14 @@
 
                             <TextView
                                 android:layout_width="wrap_content"
-                                android:layout_height="32dp"
+                                android:layout_height="34dp"
                                 android:background="@drawable/login_button_background"
                                 android:gravity="center"
                                 android:paddingStart="14dp"
                                 android:paddingEnd="14dp"
                                 android:text="SET TIME"
                                 android:textColor="#FFFFFF"
-                                android:textSize="12sp"
+                                android:textSize="13sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
@@ -305,11 +309,11 @@
                             android:background="@drawable/badge_countdown"
                             android:text="✓ Photographer Available on this Date"
                             android:textColor="@color/brand_text_dark"
-                            android:textSize="12sp"
+                            android:textSize="13sp"
                             android:textStyle="bold"
                             android:gravity="center"
                             android:layout_marginTop="12dp"
-                            android:padding="8dp" />
+                            android:padding="10dp" />
 
                     </LinearLayout>
 
@@ -335,7 +339,7 @@
                     android:layout_height="wrap_content"
                     android:text="BOOKING DETAILS &amp; OPTIONS"
                     android:textColor="@color/brand_text_dark"
-                    android:textSize="14sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -347,7 +351,7 @@
                     android:layout_height="wrap_content"
                     android:text="EVENT TYPE / PACKAGE:"
                     android:textColor="@color/brand_text_dark"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:textStyle="bold"
                     android:layout_marginTop="12dp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -356,11 +360,12 @@
                 <TextView
                     android:id="@+id/tvSelectedPackage"
                     android:layout_width="match_parent"
-                    android:layout_height="38dp"
+                    android:layout_height="44dp"
                     android:background="@drawable/dropdown_pill_background"
                     android:text="Matric Ball (R400 for 2 Hours)"
                     android:textColor="@color/brand_text_dark"
-                    android:textSize="13sp"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
                     android:gravity="center_vertical"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
@@ -378,7 +383,7 @@
                     android:layout_height="wrap_content"
                     android:text="DURATION (HOURS):"
                     android:textColor="@color/brand_text_dark"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:textStyle="bold"
                     android:layout_marginTop="12dp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -387,7 +392,7 @@
                 <LinearLayout
                     android:id="@+id/layoutHoursStepper"
                     android:layout_width="match_parent"
-                    android:layout_height="38dp"
+                    android:layout_height="42dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:layout_marginTop="4dp"
@@ -397,7 +402,7 @@
 
                     <TextView
                         android:id="@+id/btnDecreaseHours"
-                        android:layout_width="44dp"
+                        android:layout_width="48dp"
                         android:layout_height="match_parent"
                         android:background="@drawable/input_grey_background"
                         android:gravity="center"
@@ -417,14 +422,14 @@
                         android:gravity="center"
                         android:text="2 Hours"
                         android:textColor="@color/brand_text_dark"
-                        android:textSize="13sp"
+                        android:textSize="14sp"
                         android:textStyle="bold"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp" />
 
                     <TextView
                         android:id="@+id/btnIncreaseHours"
-                        android:layout_width="44dp"
+                        android:layout_width="48dp"
                         android:layout_height="match_parent"
                         android:background="@drawable/input_grey_background"
                         android:gravity="center"
@@ -436,18 +441,18 @@
                         android:focusable="true" />
                 </LinearLayout>
 
-                <!-- Calculated Price Summary -->
+                <!-- Calculated Price Summary (Theme-aware background for Light & Dark mode) -->
                 <LinearLayout
                     android:id="@+id/layoutPriceBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:background="#F3EFF9"
+                    android:background="@drawable/badge_countdown"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:layout_marginTop="12dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -459,7 +464,7 @@
                         android:layout_weight="1"
                         android:text="TOTAL ESTIMATED PRICE:"
                         android:textColor="@color/brand_text_dark"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -468,7 +473,7 @@
                         android:layout_height="wrap_content"
                         android:text="R400.00"
                         android:textColor="@color/brand_lilac_dark"
-                        android:textSize="16sp"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -479,7 +484,7 @@
                     android:layout_height="wrap_content"
                     android:text="LOCATION / VENUE:"
                     android:textColor="@color/brand_text_dark"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:textStyle="bold"
                     android:layout_marginTop="12dp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -488,13 +493,13 @@
                 <EditText
                     android:id="@+id/etBookingLocation"
                     android:layout_width="match_parent"
-                    android:layout_height="38dp"
+                    android:layout_height="44dp"
                     android:background="@drawable/input_grey_background"
                     android:text="Strandfontein, Cape Town"
                     android:textColor="@color/brand_text_dark"
-                    android:textSize="13sp"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
+                    android:textSize="14sp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
                     android:singleLine="true"
                     android:layout_marginTop="4dp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -508,7 +513,7 @@
                     android:layout_height="wrap_content"
                     android:text="CONTACT PHONE NUMBER:"
                     android:textColor="@color/brand_text_dark"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:textStyle="bold"
                     android:layout_marginTop="10dp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -517,14 +522,14 @@
                 <EditText
                     android:id="@+id/etBookingPhone"
                     android:layout_width="match_parent"
-                    android:layout_height="38dp"
+                    android:layout_height="44dp"
                     android:background="@drawable/input_grey_background"
-                    android:hint="e.g. 068 581 6456"
+                    android:hint="e.g. 084 899 3280"
                     android:textColor="@color/brand_text_dark"
-                    android:textColorHint="#888888"
-                    android:textSize="13sp"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
+                    android:textColorHint="@color/brand_input_placeholder"
+                    android:textSize="14sp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
                     android:inputType="phone"
                     android:singleLine="true"
                     android:layout_marginTop="4dp"
@@ -539,7 +544,7 @@
                     android:layout_height="wrap_content"
                     android:text="NOTES / SPECIAL REQUIREMENTS:"
                     android:textColor="@color/brand_text_dark"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:textStyle="bold"
                     android:layout_marginTop="10dp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -548,14 +553,14 @@
                 <EditText
                     android:id="@+id/etBookingRequirements"
                     android:layout_width="match_parent"
-                    android:layout_height="38dp"
+                    android:layout_height="44dp"
                     android:background="@drawable/input_grey_background"
                     android:hint="e.g. 2 outfits, outdoor lighting"
                     android:textColor="@color/brand_text_dark"
-                    android:textColorHint="#888888"
-                    android:textSize="13sp"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
+                    android:textColorHint="@color/brand_input_placeholder"
+                    android:textSize="14sp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
                     android:singleLine="true"
                     android:layout_marginTop="4dp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -566,7 +571,7 @@
                 <TextView
                     android:id="@+id/btnMakeBooking"
                     android:layout_width="match_parent"
-                    android:layout_height="44dp"
+                    android:layout_height="48dp"
                     android:layout_marginTop="16dp"
                     android:background="@drawable/login_button_background"
                     android:elevation="3dp"

@@ -2,9 +2,7 @@ package com.example.ilyphoto
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
@@ -17,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.ilyphoto.data.Booking
 import com.example.ilyphoto.data.ServiceLocator
 import com.example.ilyphoto.data.UserProfile
 import com.example.ilyphoto.data.toUserMessage
@@ -41,7 +40,8 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
         PackageOption("Matric Ball", 400, 2, 150, "R400 for 2 Hours (R150/extra hr)"),
         PackageOption("Weddings", 1200, 6, 200, "R1200 for 6 Hours (R200/extra hr)"),
         PackageOption("Events", 400, 2, 150, "R400 for 2 Hours (R150/extra hr)"),
-        PackageOption("Portraits", 300, 1, 150, "R300 for 1 Hour (R150/extra hr)")
+        PackageOption("Portraits", 300, 1, 150, "R300 for 1 Hour (R150/extra hr)"),
+        PackageOption("Community / NGO Outreach", 200, 2, 100, "R200 for 2 Hours (Subsidised NGO & School Rate)")
     )
 
     private var selectedPackage = packageOptions[0]
@@ -61,6 +61,7 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
         super.onViewCreated(view, savedInstanceState)
 
         val editingBookingId = arguments?.getString("bookingId")
+        val initialPackageName = arguments?.getString("selectedPackageName")
 
         // Top Right Profile Button
         val btnTopProfile = view.findViewById<View>(R.id.btnTopProfile)
@@ -104,6 +105,18 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
         val navSettings = view.findViewById<FrameLayout>(R.id.navSettings)
         val navMenu = view.findViewById<FrameLayout>(R.id.navMenu)
 
+        // Apply pre-selected package from Packages screen if not editing an existing booking
+        if (editingBookingId.isNullOrEmpty() && !initialPackageName.isNullOrBlank()) {
+            packageOptions.firstOrNull {
+                it.name.equals(initialPackageName, ignoreCase = true) ||
+                    initialPackageName.contains(it.name, ignoreCase = true)
+            }?.let { matched ->
+                selectedPackage = matched
+                durationHours = matched.baseHours
+                tvSelectedPackage?.text = "${matched.name} (${matched.description})"
+            }
+        }
+
         fun updatePriceAndHours() {
             val extraHours = maxOf(0, durationHours - selectedPackage.baseHours)
             servicePrice = selectedPackage.basePrice + (extraHours * selectedPackage.extraHourlyRate)
@@ -127,17 +140,22 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
             tvChosenTime?.text = "⏰ $time24 ($timeAmPm)"
 
             val eventDateKey = SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH).format(selectedCalendar.time)
+            tvDateAvailability?.text = "⏳ Checking live Azure schedule..."
+            tvDateAvailability?.setBackgroundResource(R.drawable.badge_countdown)
+            tvDateAvailability?.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_text_dark))
+
             viewLifecycleOwner.lifecycleScope.launch {
-                val currentBookings = ServiceLocator.bookings.bookings().firstOrNull().orEmpty()
-                val isBooked = currentBookings.any { b ->
-                    b.eventDate.equals(eventDateKey, ignoreCase = true) &&
-                        b.status !in listOf("Cancelled", "Rejected") &&
-                        b.id != editingBookingId
-                }
-                if (isBooked) {
+                val isAvailable = runCatching {
+                    ServiceLocator.bookings.checkAvailability(
+                        eventDate = eventDateKey,
+                        excludeBookingId = editingBookingId
+                    )
+                }.getOrDefault(true)
+
+                if (!isAvailable) {
                     tvDateAvailability?.text = "⚠️ Date Already Booked — Please Select Another Date"
                     tvDateAvailability?.setBackgroundResource(R.drawable.badge_pending)
-                    tvDateAvailability?.setTextColor(Color.parseColor("#C62828"))
+                    tvDateAvailability?.setTextColor(Color.WHITE)
                 } else {
                     tvDateAvailability?.text = "✓ Photographer Available on this Date"
                     tvDateAvailability?.setBackgroundResource(R.drawable.badge_countdown)
@@ -198,16 +216,25 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
                 val existing = ServiceLocator.bookings.getBookingById(editingBookingId)
                 if (existing != null) {
                     val matchedPkg = packageOptions.firstOrNull {
-                        it.name.equals(existing.serviceName, ignoreCase = true)
+                        it.name.equals(existing.serviceName, ignoreCase = true) ||
+                            existing.serviceName.contains(it.name, ignoreCase = true)
                     } ?: packageOptions[0]
                     selectedPackage = matchedPkg
-                    durationHours = existing.durationHours
+                    durationHours = existing.durationHours.coerceAtLeast(1)
                     servicePrice = existing.servicePrice
 
                     runCatching {
-                        val sdf = SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH)
-                        sdf.parse(existing.eventDate)?.let { date ->
-                            selectedCalendar.time = date
+                        val normalizedIso = Booking.normalizeDateKey(existing.eventDate)
+                        val isoFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+                        val displayFormat = SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH)
+                        val parsed = runCatching { isoFormat.parse(normalizedIso) }.getOrNull()
+                            ?: runCatching { displayFormat.parse(existing.eventDate) }.getOrNull()
+                        if (parsed != null) {
+                            val hour = selectedCalendar.get(Calendar.HOUR_OF_DAY)
+                            val min = selectedCalendar.get(Calendar.MINUTE)
+                            selectedCalendar.time = parsed
+                            selectedCalendar.set(Calendar.HOUR_OF_DAY, hour)
+                            selectedCalendar.set(Calendar.MINUTE, min)
                         }
                     }
                     runCatching {
@@ -287,25 +314,13 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
             btnMakeBooking.isEnabled = false
 
             viewLifecycleOwner.lifecycleScope.launch {
-                val currentBookings = ServiceLocator.bookings.bookings().firstOrNull().orEmpty()
-                val isBooked = currentBookings.any { b ->
-                    b.eventDate.equals(formattedDate, ignoreCase = true) &&
-                        b.status !in listOf("Cancelled", "Rejected") &&
-                        b.id != editingBookingId
-                }
-                if (isBooked) {
-                    btnMakeBooking.isEnabled = true
-                    conflictOverlay?.visibility = View.VISIBLE
-                    return@launch
-                }
-
                 val userProfile: UserProfile? = ServiceLocator.auth.currentUser.firstOrNull()
                 val phone = etBookingPhone?.text?.toString()?.trim().orEmpty().ifEmpty {
-                    userProfile?.phone.orEmpty().ifEmpty { "0685816456" }
+                    userProfile?.phone.orEmpty().ifEmpty { "0848993280" }
                 }
 
                 if (!editingBookingId.isNullOrEmpty()) {
-                    // Update existing booking in place without duplicating
+                    // Persist all amended fields (date, time, venue, package, price, duration, requirements) to Azure
                     val result = ServiceLocator.bookings.updateBooking(
                         bookingId = editingBookingId,
                         serviceName = selectedPackage.name,
@@ -319,10 +334,17 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
                     )
                     btnMakeBooking.isEnabled = true
 
-                    result.onSuccess {
+                    result.onSuccess { updatedBooking ->
+                        IlyNotificationHelper.notifyBookingRescheduled(
+                            requireContext(),
+                            updatedBooking.serviceName,
+                            updatedBooking.eventDate,
+                            updatedBooking.eventTime,
+                            updatedBooking.eventLocation
+                        )
                         Toast.makeText(
                             requireContext(),
-                            "Booking updated successfully for $formattedDate!",
+                            "Booking updated for ${updatedBooking.eventDate} at ${updatedBooking.eventTime} (${updatedBooking.eventLocation})!",
                             Toast.LENGTH_LONG
                         ).show()
                         findNavController().navigate(R.id.action_bookingFragment_to_myBookingFragment)
@@ -335,7 +357,7 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
                         }
                     }
                 } else {
-                    // Create fresh new booking
+                    // Create fresh new booking after authoritative cloud conflict verification
                     val result = ServiceLocator.bookings.createBooking(
                         clientProfile = userProfile,
                         clientPhone = phone,
@@ -350,6 +372,12 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
                     btnMakeBooking.isEnabled = true
 
                     result.onSuccess { booking ->
+                        IlyNotificationHelper.notifyBookingCreated(
+                            requireContext(),
+                            booking.serviceName,
+                            booking.eventDate,
+                            booking.invoiceNumber
+                        )
                         Toast.makeText(
                             requireContext(),
                             "Booking confirmed for $formattedDate! Invoice: ${booking.invoiceNumber}",

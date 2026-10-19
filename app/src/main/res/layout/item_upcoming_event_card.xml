@@ -33,12 +33,12 @@
         android:background="@drawable/badge_paid"
         android:text="APPROVED"
         android:textColor="#FFFFFF"
-        android:textSize="11sp"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:paddingTop="3dp"
-        android:paddingBottom="3dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:text="Matric Ball Photoshoot"
         android:textColor="@color/brand_lilac_dark"
-        android:textSize="16sp"
+        android:textSize="17sp"
         android:textStyle="bold"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:text="📅 04 September 2026 • 14:00"
         android:textColor="@color/brand_text_dark"
-        android:textSize="13sp"
+        android:textSize="14sp"
         android:textStyle="bold"
         android:layout_marginTop="6dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -77,7 +77,7 @@
         android:layout_height="wrap_content"
         android:text="📍 Strandfontein, Cape Town"
         android:textColor="@color/brand_text_muted"
-        android:textSize="12sp"
+        android:textSize="13sp"
         android:layout_marginTop="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -104,7 +104,7 @@
             android:layout_height="wrap_content"
             android:text="⏳ 12 days 4 hrs remaining"
             android:textColor="@color/brand_text_dark"
-            android:textSize="12sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -112,7 +112,7 @@
     <TextView
         android:id="@+id/btnUpcomingMore"
         android:layout_width="wrap_content"
-        android:layout_height="36dp"
+        android:layout_height="40dp"
         android:background="@drawable/login_button_background"
         android:elevation="2dp"
         android:gravity="center"

@@ -16,25 +16,21 @@ import java.util.UUID
 import kotlin.math.max
 
 /**
- * Photos repository backed by Azure Blob Storage & Cosmos DB,
- * with instant local cache for fast offline and online gallery experiences.
+ * Photos repository backed by Azure Blob Storage (`ilyphoto-galleries`) and
+ * Azure Table Storage (`Galleries` and `Photos` tables).
  */
-class PhotoRepository {
+class PhotoRepository(
+    private val api: IlyCloudApi = AzureApiClient
+) {
 
     private val localPhotos = MutableStateFlow<List<Photo>>(emptyList())
 
     /** Live list of all photos, newest first. */
     fun photos(): Flow<List<Photo>> = flow {
-        // Emit current local photos immediately
-        emit(localPhotos.value)
-
         try {
-            val remote = AzureApiClient.getPhotos()
-            val remoteIds = remote.map { it.id }.toSet()
-            val unsyncedLocal = localPhotos.value.filter { it.id !in remoteIds }
-            val combined = (unsyncedLocal + remote).sortedByDescending { it.createdAt?.time ?: 0L }
-            localPhotos.value = combined
-            emit(combined)
+            val remote = api.getPhotos().sortedByDescending { it.createdAt?.time ?: 0L }
+            localPhotos.value = remote
+            emit(remote)
         } catch (_: Exception) {
             emit(localPhotos.value)
         }
@@ -42,7 +38,7 @@ class PhotoRepository {
 
     /**
      * Uploads a photo from a device [imageUri] or direct [imageUrlInput], then writes its
-     * metadata to Azure Cosmos DB and Azure Blob Storage.
+     * metadata to Azure Table Storage and Azure Blob Storage before updating local state.
      */
     suspend fun upload(
         context: Context? = null,
@@ -82,15 +78,8 @@ class PhotoRepository {
             createdAt = now,
         )
 
-        // Update local state immediately so the UI refreshes right away
-        localPhotos.value = listOf(newPhoto) + localPhotos.value
-
-        try {
-            AzureApiClient.createPhoto(newPhoto)
-        } catch (_: Exception) {
-            // Keep in local cache if offline
-        }
-        Unit
+        val created = api.createPhoto(newPhoto)
+        localPhotos.value = listOf(created) + localPhotos.value.filterNot { it.id == created.id }
     }
 
     private suspend fun encodeUriToDataUrl(context: Context, uri: Uri): String? =
@@ -120,10 +109,7 @@ class PhotoRepository {
         }
 
     suspend fun delete(photo: Photo): Result<Unit> = azureCall {
+        api.deletePhoto(photo.id)
         localPhotos.value = localPhotos.value.filterNot { it.id == photo.id }
-        try {
-            AzureApiClient.deletePhoto(photo.id)
-        } catch (_: Exception) {}
-        Unit
     }
 }

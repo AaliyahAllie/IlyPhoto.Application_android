@@ -2,42 +2,91 @@ package com.example.ilyphoto.data
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import java.util.Date
 import java.util.UUID
 
 /**
- * Manages client bookings, photographer availability checking (FR08), booking status
- * updates (FR09, FR10), and invoice generation/status tracking (FR14-FR17) backed by
- * Azure Cosmos DB.
+ * Manages client bookings, photographer availability checking (FR08), booking rescheduling
+ * and status updates (FR09, FR10), and invoice generation/status tracking (FR14-FR17)
+ * backed by Azure Table Storage (`Bookings` and `Invoices` tables).
+ *
+ * Integrity Guarantees:
+ * - Availability checks (`checkAvailability`, `createBooking`, `updateBooking`) always fetch
+ *   the latest cloud records from Azure Table Storage before evaluating date conflicts,
+ *   preventing stale cached bookings from causing false positives or double-bookings.
+ * - Rescheduling (`updateBooking`) persists all amended fields (date, time, venue, package,
+ *   price, duration, requirements, phone, and status) to the Azure API before updating local state.
+ * - Write operations never suppress exceptions; cloud persistence is verified before reporting success.
  */
-class BookingRepository {
+class BookingRepository(
+    private val api: IlyCloudApi = AzureApiClient
+) {
 
     private val localBookings = MutableStateFlow<List<Booking>>(emptyList())
 
-    fun bookings(): Flow<List<Booking>> = flow {
-        // First emit current local state immediately for instant UI
-        emit(localBookings.value)
+    /**
+     * Seeds the in-memory cache (used by unit tests to verify that cloud data takes
+     * precedence over stale cached bookings during availability checks).
+     */
+    internal fun seedLocalCache(bookings: List<Booking>) {
+        localBookings.value = bookings
+    }
 
-        // Then attempt to fetch latest from Azure Cloud Database
+    /**
+     * Fetches the authoritative list of bookings from Azure Table Storage (`GET /api/bookings`)
+     * and updates the in-memory state flow.
+     */
+    suspend fun fetchLatestBookings(): List<Booking> {
+        val remote = api.getBookings()
+            .sortedByDescending { it.createdAt?.time ?: 0L }
+        val merged = if (remote.isNotEmpty()) {
+            (remote + localBookings.value).distinctBy { it.id }
+                .sortedByDescending { it.createdAt?.time ?: 0L }
+        } else {
+            localBookings.value
+        }
+        localBookings.value = merged
+        return merged
+    }
+
+    /**
+     * Streams bookings by emitting the local in-memory bookings immediately for responsive UI,
+     * then loading authoritative cloud data from Azure Table Storage.
+     */
+    fun bookings(): Flow<List<Booking>> = flow {
+        if (localBookings.value.isNotEmpty()) {
+            emit(localBookings.value)
+        }
         try {
-            val remote = AzureApiClient.getBookings()
-            val remoteIds = remote.map { it.id }.toSet()
-            val unsyncedLocal = localBookings.value.filter { it.id !in remoteIds }
-            val combined = (unsyncedLocal + remote).sortedByDescending { it.createdAt?.time ?: 0L }
-            localBookings.value = combined
-            emit(combined)
+            val remote = fetchLatestBookings()
+            emit(remote)
         } catch (_: Exception) {
-            // Keep local bookings when offline
             emit(localBookings.value)
         }
     }
 
     /**
-     * Checks photographer availability for [eventDate] (FR08) and creates a booking +
-     * invoice record (FR07, FR14) in Azure Cosmos DB.
+     * Verifies whether [eventDate] is available by loading the latest bookings from Azure
+     * Table Storage first (never relying on cached bookings before cloud data loads).
+     *
+     * @return `true` if the date is available, `false` if another active booking conflicts.
+     */
+    suspend fun checkAvailability(
+        eventDate: String,
+        excludeBookingId: String? = null,
+    ): Boolean {
+        val cleanDate = eventDate.trim()
+        require(cleanDate.isNotBlank()) { "Please select an event date." }
+        val cloudBookings = fetchLatestBookings()
+        return cloudBookings.none { existing ->
+            existing.conflictsWithDate(cleanDate, excludeBookingId = excludeBookingId)
+        }
+    }
+
+    /**
+     * Checks photographer availability for [eventDate] against live Azure Table Storage data (FR08)
+     * and creates a booking + invoice record (FR07, FR14) in Azure Table Storage.
      */
     suspend fun createBooking(
         clientProfile: UserProfile?,
@@ -50,23 +99,34 @@ class BookingRepository {
         eventLocation: String,
         requirements: String,
     ): Result<Booking> = azureCall {
-        val currentList = bookings().firstOrNull().orEmpty()
+        val cleanDate = eventDate.trim()
+        val cleanTime = eventTime.trim().ifEmpty { "09:00" }
+        val cleanLocation = eventLocation.trim()
+        val cleanPhone = clientPhone.trim()
+
+        require(cleanDate.isNotBlank()) { "Please select an event date." }
+        require(cleanLocation.isNotBlank()) { "Please enter the event location or venue." }
+        require(cleanPhone.isNotBlank()) { "Please enter a contact phone number." }
+
+        // Always fetch authoritative cloud bookings before checking conflicts
+        val currentList = fetchLatestBookings()
         val conflicting = currentList.any { existing ->
-            existing.eventDate.equals(eventDate.trim(), ignoreCase = true) &&
-                existing.status !in listOf("Cancelled", "Rejected")
+            existing.conflictsWithDate(cleanDate)
         }
         if (conflicting) {
             error(
-                "OOPS! Looks like there is already an event booked on $eventDate. " +
+                "OOPS! Looks like there is already an event booked on $cleanDate. " +
                     "Please select a different date."
             )
         }
 
         val cachedProfile = AzureProvider.getCachedProfile()
         val uid = clientProfile?.clientId?.takeIf { it.isNotBlank() }
-            ?: clientProfile?.uid
+            ?: clientProfile?.uid?.takeIf { it.isNotBlank() }
             ?: cachedProfile?.clientId?.takeIf { it.isNotBlank() }
-            ?: cachedProfile?.uid
+            ?: cachedProfile?.uid?.takeIf { it.isNotBlank() }
+            ?: clientProfile?.email?.takeIf { it.isNotBlank() }
+            ?: cachedProfile?.email?.takeIf { it.isNotBlank() }
             ?: "guest-client"
         val name = clientProfile?.displayName?.takeIf { it.isNotBlank() }
             ?: cachedProfile?.displayName?.takeIf { it.isNotBlank() }
@@ -74,8 +134,8 @@ class BookingRepository {
         val email = clientProfile?.email?.takeIf { it.isNotBlank() }
             ?: cachedProfile?.email.orEmpty()
 
-        val docId = UUID.randomUUID().toString()
-        val invoiceNo = "INV-" + docId.take(6).uppercase()
+        val docId = "BK-" + UUID.randomUUID().toString().take(8).uppercase()
+        val invoiceNo = "INV-" + docId.removePrefix("BK-").take(6).uppercase()
         val now = Date()
 
         val booking = Booking(
@@ -83,13 +143,13 @@ class BookingRepository {
             clientId = uid,
             clientName = name,
             clientEmail = email,
-            clientPhone = clientPhone.trim(),
-            serviceName = serviceName,
+            clientPhone = cleanPhone,
+            serviceName = serviceName.trim(),
             servicePrice = servicePrice,
             durationHours = durationHours,
-            eventDate = eventDate.trim(),
-            eventTime = eventTime.trim(),
-            eventLocation = eventLocation.trim(),
+            eventDate = cleanDate,
+            eventTime = cleanTime,
+            eventLocation = cleanLocation,
             requirements = requirements.trim(),
             status = "Pending",
             invoiceNumber = invoiceNo,
@@ -97,26 +157,25 @@ class BookingRepository {
             createdAt = now,
         )
 
-        localBookings.value = listOf(booking) + localBookings.value
-
-        try {
-            val created = AzureApiClient.createBooking(booking)
-            localBookings.value = localBookings.value.map { if (it.id == booking.id) created else it }
-            created
-        } catch (_: Exception) {
-            // Keep local version when offline
-            booking
-        }
+        val created = api.createBooking(booking)
+        localBookings.value = listOf(created) + localBookings.value.filterNot { it.id == created.id }
+        created
     }
 
     suspend fun getBookingById(bookingId: String): Booking? {
-        val currentList = bookings().firstOrNull().orEmpty()
-        return currentList.firstOrNull { it.id == bookingId }
-            ?: localBookings.value.firstOrNull { it.id == bookingId }
+        return try {
+            val currentList = fetchLatestBookings()
+            currentList.firstOrNull { it.id == bookingId }
+                ?: localBookings.value.firstOrNull { it.id == bookingId }
+        } catch (_: Exception) {
+            localBookings.value.firstOrNull { it.id == bookingId }
+        }
     }
 
     /**
-     * Updates an existing booking in-place (reschedule / edit). Does not create a duplicate booking.
+     * Updates an existing booking in Azure Table Storage (reschedule / edit) and persists
+     * ALL amended fields (`serviceName`, `servicePrice`, `durationHours`, `eventDate`,
+     * `eventTime`, `eventLocation`, `requirements`, `clientPhone`, and `status`) across devices.
      */
     suspend fun updateBooking(
         bookingId: String,
@@ -129,15 +188,21 @@ class BookingRepository {
         requirements: String,
         clientPhone: String? = null,
     ): Result<Booking> = azureCall {
-        val currentList = bookings().firstOrNull().orEmpty()
+        val cleanDate = eventDate.trim()
+        val cleanTime = eventTime.trim().ifEmpty { "14:00" }
+        val cleanLocation = eventLocation.trim()
+
+        require(cleanDate.isNotBlank()) { "Please select an event date." }
+        require(cleanLocation.isNotBlank()) { "Please enter the event location or venue." }
+
+        // Always fetch authoritative cloud bookings before checking conflicts
+        val currentList = fetchLatestBookings()
         val conflicting = currentList.any { existing ->
-            existing.id != bookingId &&
-                existing.eventDate.equals(eventDate.trim(), ignoreCase = true) &&
-                existing.status !in listOf("Cancelled", "Rejected")
+            existing.conflictsWithDate(cleanDate, excludeBookingId = bookingId)
         }
         if (conflicting) {
             error(
-                "OOPS! Looks like there is already an event booked on $eventDate. " +
+                "OOPS! Looks like there is already an event booked on $cleanDate. " +
                     "Please select a different date."
             )
         }
@@ -146,47 +211,51 @@ class BookingRepository {
             ?: localBookings.value.firstOrNull { it.id == bookingId }
             ?: error("Booking not found.")
 
+        val dateChanged = !Booking.normalizeDateKey(existing.eventDate)
+            .equals(Booking.normalizeDateKey(cleanDate), ignoreCase = true)
+        val timeChanged = !existing.eventTime.trim().equals(cleanTime, ignoreCase = true)
+        val locationChanged = !existing.eventLocation.trim().equals(cleanLocation, ignoreCase = true)
+
+        val newStatus = if (dateChanged || timeChanged || locationChanged) {
+            "Rescheduled"
+        } else {
+            existing.status
+        }
+
         val updated = existing.copy(
             serviceName = serviceName.trim(),
             servicePrice = servicePrice,
             durationHours = durationHours,
-            eventDate = eventDate.trim(),
-            eventTime = eventTime.trim(),
-            eventLocation = eventLocation.trim(),
+            eventDate = cleanDate,
+            eventTime = cleanTime,
+            eventLocation = cleanLocation,
             requirements = requirements.trim(),
             clientPhone = clientPhone?.trim()?.ifEmpty { existing.clientPhone } ?: existing.clientPhone,
-            status = if (existing.eventDate != eventDate.trim()) "Rescheduled" else existing.status
+            status = newStatus
         )
 
-        localBookings.value = localBookings.value.map {
-            if (it.id == bookingId) updated else it
-        }.let { list ->
-            if (list.any { it.id == bookingId }) list else listOf(updated) + list
-        }
+        // Persist all amended fields to the Azure backend BEFORE mutating local cache
+        val saved = api.updateBooking(updated)
 
-        try {
-            AzureApiClient.updateBookingStatus(bookingId, updated.status)
-        } catch (_: Exception) {}
+        localBookings.value = localBookings.value
+            .filterNot { it.id == bookingId || it.id == saved.id }
+            .let { listOf(saved) + it }
 
-        updated
+        saved
     }
 
     /**
-     * Cancels an existing booking if it has not been paid.
+     * Cancels an existing booking in Azure Table Storage if it has not been paid.
      */
     suspend fun cancelBooking(booking: Booking): Result<Unit> = azureCall {
         if (booking.invoiceStatus.equals("Paid", ignoreCase = true)) {
             error("Paid bookings cannot be cancelled via the app. Please contact ILY PHOTO directly.")
         }
+        api.updateBookingStatus(booking.id, "Cancelled")
         val updated = booking.copy(status = "Cancelled")
         localBookings.value = localBookings.value.map {
             if (it.id == booking.id) updated else it
         }
-
-        try {
-            AzureApiClient.updateBookingStatus(booking.id, "Cancelled")
-        } catch (_: Exception) {}
-        Unit
     }
 
     suspend fun updateBookingStatus(
@@ -197,44 +266,38 @@ class BookingRepository {
     ): Result<Unit> = azureCall {
         val updated = booking.copy(
             status = newStatus,
-            eventDate = newDate ?: booking.eventDate,
-            eventTime = newTime ?: booking.eventTime,
+            eventDate = newDate?.trim() ?: booking.eventDate,
+            eventTime = newTime?.trim() ?: booking.eventTime,
         )
-        localBookings.value = localBookings.value.map {
-            if (it.id == booking.id) updated else it
-        }.let { list ->
-            if (list.any { it.id == booking.id }) list else listOf(updated) + list
+
+        val saved = if (newDate != null || newTime != null) {
+            api.updateBooking(updated)
+        } else {
+            api.updateBookingStatus(booking.id, newStatus)
+            updated
         }
 
-        try {
-            AzureApiClient.updateBookingStatus(booking.id, newStatus)
-        } catch (_: Exception) {}
-        Unit
+        localBookings.value = localBookings.value
+            .filterNot { it.id == booking.id || it.id == saved.id }
+            .let { listOf(saved) + it }
     }
 
     suspend fun updateInvoiceStatus(booking: Booking, newInvoiceStatus: String): Result<Unit> =
         azureCall {
+            api.updateInvoiceStatus(booking.id, newInvoiceStatus)
             val updated = booking.copy(invoiceStatus = newInvoiceStatus)
             localBookings.value = localBookings.value.map {
                 if (it.id == booking.id) updated else it
             }.let { list ->
                 if (list.any { it.id == booking.id }) list else listOf(updated) + list
             }
-
-            try {
-                AzureApiClient.updateInvoiceStatus(booking.id, newInvoiceStatus)
-            } catch (_: Exception) {}
-            Unit
         }
 
     suspend fun updateInvoiceStatusById(bookingId: String, newInvoiceStatus: String): Result<Unit> =
         azureCall {
+            api.updateInvoiceStatus(bookingId, newInvoiceStatus)
             localBookings.value = localBookings.value.map {
                 if (it.id == bookingId) it.copy(invoiceStatus = newInvoiceStatus) else it
             }
-            try {
-                AzureApiClient.updateInvoiceStatus(bookingId, newInvoiceStatus)
-            } catch (_: Exception) {}
-            Unit
         }
 }

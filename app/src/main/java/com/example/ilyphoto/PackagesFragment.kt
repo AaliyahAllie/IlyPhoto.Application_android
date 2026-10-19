@@ -1,7 +1,5 @@
 package com.example.ilyphoto
 
-import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
@@ -36,25 +34,38 @@ class PackagesFragment : Fragment(R.layout.fragment_packages) {
         val btnBookMatric = view.findViewById<TextView>(R.id.btnBookMatricBalls)
         val btnBookWeddings = view.findViewById<TextView>(R.id.btnBookWeddings)
         val btnBookEvents = view.findViewById<TextView>(R.id.btnBookEvents)
+        val btnBookCommunityOutreach = view.findViewById<TextView>(R.id.btnBookCommunityOutreach)
         val btnViewBookings = view.findViewById<TextView>(R.id.btnPackagesViewBookings)
 
         val navHome = view.findViewById<FrameLayout>(R.id.navHome)
         val navSettings = view.findViewById<FrameLayout>(R.id.navSettings)
         val navMenu = view.findViewById<FrameLayout>(R.id.navMenu)
 
+        fun navigateWithPackage(packageName: String, toastMessage: String) {
+            Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_SHORT).show()
+            val bundle = Bundle().apply {
+                putString("selectedPackageName", packageName)
+            }
+            findNavController().navigate(R.id.action_packagesFragment_to_bookingFragment, bundle)
+        }
+
         btnBookMatric?.setOnClickListener {
-            Toast.makeText(requireContext(), "Selected: Matric Balls (R400 / 2h)", Toast.LENGTH_SHORT).show()
-            findNavController().navigate(R.id.action_packagesFragment_to_bookingFragment)
+            navigateWithPackage("Matric Ball", "Selected: Matric Ball (R400 / 2h)")
         }
 
         btnBookWeddings?.setOnClickListener {
-            Toast.makeText(requireContext(), "Selected: Weddings (From R1200 / 6h)", Toast.LENGTH_SHORT).show()
-            findNavController().navigate(R.id.action_packagesFragment_to_bookingFragment)
+            navigateWithPackage("Weddings", "Selected: Weddings (From R1200 / 6h)")
         }
 
         btnBookEvents?.setOnClickListener {
-            Toast.makeText(requireContext(), "Selected: Events (R400 / 2h)", Toast.LENGTH_SHORT).show()
-            findNavController().navigate(R.id.action_packagesFragment_to_bookingFragment)
+            navigateWithPackage("Events", "Selected: Events (R400 / 2h)")
+        }
+
+        btnBookCommunityOutreach?.setOnClickListener {
+            navigateWithPackage(
+                "Community / NGO Outreach",
+                "Selected: Community / NGO Outreach (R200 / 2h Subsidised Rate)"
+            )
         }
 
         btnViewBookings?.setOnClickListener {

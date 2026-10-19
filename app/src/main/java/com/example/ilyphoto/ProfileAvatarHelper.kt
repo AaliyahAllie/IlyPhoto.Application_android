@@ -18,8 +18,9 @@ import java.io.InputStream
 object ProfileAvatarHelper {
 
     /**
-     * Loads the avatar for the given [profile] or currently logged in client into [imageView].
-     * Scoped strictly to the client ID and retrieved from the database or local cache.
+     * Loads the avatar for the given [profile] or currently logged-in client into [imageView].
+     * Scoped strictly to the client ID and retrieved from Azure Table Storage (`Users` table)
+     * or local client-scoped cache.
      */
     fun loadAvatar(context: Context, imageView: ImageView?, profile: UserProfile?) {
         if (imageView == null) return
@@ -32,7 +33,7 @@ object ProfileAvatarHelper {
 
         val photoUrl = profile?.photoUrl.orEmpty()
 
-        // 1. If photoUrl is Base64 stored in database
+        // 1. If photoUrl is Base64 stored in Azure Table Storage
         if (photoUrl.startsWith("data:image") || (photoUrl.length > 100 && !photoUrl.startsWith("http") && !photoUrl.startsWith("file") && !photoUrl.startsWith("content"))) {
             val base64Clean = if (photoUrl.contains(",")) photoUrl.substringAfter(",") else photoUrl
             runCatching {
@@ -80,7 +81,8 @@ object ProfileAvatarHelper {
     }
 
     /**
-     * Saves selected avatar image locally and updates Firestore database linked to client UID.
+     * Saves selected avatar image locally and updates the `Users` table in Azure Table Storage
+     * linked to the authenticated client's `RowKey` (`uid`).
      */
     suspend fun saveAndUploadAvatar(
         context: Context,
@@ -116,24 +118,28 @@ object ProfileAvatarHelper {
                 bitmap
             }
 
-            // 1. Save to internal persistent storage
-            FileOutputStream(destFile).use { out ->
-                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
-            }
-
-            // 2. Convert to Base64 data string to save directly into Firestore users/{uid}.photoUrl
+            // 1. Convert to Base64 data string to persist in Azure Table Storage Users table
             val baos = ByteArrayOutputStream()
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos)
             val base64String = "data:image/jpeg;base64," + Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP)
 
-            // 3. Save to client-scoped SharedPreferences
+            // 2. Persist to Azure Table Storage first to protect data integrity
+            val updateResult = ServiceLocator.auth.updateProfilePhoto(uid, base64String)
+            if (updateResult.isFailure) {
+                withContext(Dispatchers.Main) {
+                    onComplete(false)
+                }
+                return@withContext
+            }
+
+            // 3. Save to internal persistent storage and client-scoped SharedPreferences
+            FileOutputStream(destFile).use { out ->
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
+            }
             val prefs = context.getSharedPreferences("ily_photo_prefs", Context.MODE_PRIVATE)
             prefs.edit()
                 .putString("custom_avatar_uri_$uid", Uri.fromFile(destFile).toString())
                 .apply()
-
-            // 4. Update Database (Firestore & Auth)
-            ServiceLocator.auth.updateProfilePhoto(uid, base64String)
 
             withContext(Dispatchers.Main) {
                 onComplete(true)

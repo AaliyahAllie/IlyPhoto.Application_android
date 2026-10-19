@@ -7,22 +7,20 @@ import java.util.Date
 import java.util.UUID
 
 /**
- * Manages client enquiries (FR19 & Enquiry entity in Task 1 ERD) backed by Azure Cosmos DB.
+ * Manages client enquiries (FR19 & Enquiry entity in Task 1 ERD) backed by
+ * Azure Table Storage (`Enquiries` table).
  */
-class EnquiryRepository {
+class EnquiryRepository(
+    private val api: IlyCloudApi = AzureApiClient
+) {
 
     private val localEnquiries = MutableStateFlow<List<Enquiry>>(emptyList())
 
     fun enquiries(): Flow<List<Enquiry>> = flow {
-        emit(localEnquiries.value)
-
         try {
-            val remote = AzureApiClient.getEnquiries()
-            val remoteIds = remote.map { it.id }.toSet()
-            val unsyncedLocal = localEnquiries.value.filter { it.id !in remoteIds }
-            val combined = (unsyncedLocal + remote).sortedByDescending { it.createdAt?.time ?: 0L }
-            localEnquiries.value = combined
-            emit(combined)
+            val remote = api.getEnquiries().sortedByDescending { it.createdAt?.time ?: 0L }
+            localEnquiries.value = remote
+            emit(remote)
         } catch (_: Exception) {
             emit(localEnquiries.value)
         }
@@ -34,25 +32,29 @@ class EnquiryRepository {
         phone: String,
         message: String,
     ): Result<Unit> = azureCall {
-        val uid = AzureProvider.getCachedProfile()?.uid.orEmpty()
-        val docId = UUID.randomUUID().toString()
+        val cleanName = fullName.trim()
+        val cleanEmail = email.trim()
+        val cleanMessage = message.trim()
+        require(cleanName.isNotBlank()) { "Please enter your name." }
+        require(cleanEmail.isNotBlank() && cleanEmail.contains("@")) { "Please enter a valid email address." }
+        require(cleanMessage.isNotBlank()) { "Please enter an enquiry message." }
+
+        val profile = AzureProvider.getCachedProfile()
+        val uid = profile?.clientId?.ifBlank { profile.uid }.orEmpty()
+        val docId = "ENQ-" + UUID.randomUUID().toString().take(8).uppercase()
         val now = Date()
         val enquiry = Enquiry(
             id = docId,
             clientId = uid,
-            fullName = fullName.trim(),
-            email = email.trim(),
+            fullName = cleanName,
+            email = cleanEmail,
             phone = phone.trim(),
-            message = message.trim(),
+            message = cleanMessage,
             status = "New",
             createdAt = now,
         )
 
+        api.submitEnquiry(enquiry)
         localEnquiries.value = listOf(enquiry) + localEnquiries.value
-
-        try {
-            AzureApiClient.submitEnquiry(enquiry)
-        } catch (_: Exception) {}
-        Unit
     }
 }

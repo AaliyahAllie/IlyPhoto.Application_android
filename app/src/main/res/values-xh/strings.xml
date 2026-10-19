@@ -28,6 +28,9 @@
     <string name="weddings_price">UKUSUSELA KU-R1200 NGEEYURE EZI-6</string>
     <string name="events">IMISITHO</string>
     <string name="events_price">R400 NGEEYURE EZI-2</string>
+    <string name="community_outreach_title">ULUNTU &amp; INGCACISO YE-NGO</string>
+    <string name="community_outreach_price">R200 NGEEYURE EZI-2 (IXABISO ELIXHASIWEYO)</string>
+    <string name="community_outreach_desc">Ukufota okuxhasiweyo kwimibutho yolutsha yaseStrandfontein &amp; Cape Flats (NGOs) kunye nabafundi beMatriki.</string>
     <string name="book">BHUKISHA</string>
 
     <!-- Booking -->

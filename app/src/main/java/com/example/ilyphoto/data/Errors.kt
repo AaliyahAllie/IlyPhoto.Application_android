@@ -33,13 +33,18 @@ fun Throwable.toUserMessage(): String = when (this) {
         "Cannot reach Azure cloud server. Check your network connection."
     is SocketTimeoutException ->
         "Azure server timed out. Please try again."
-    is AzureApiException -> when (statusCode) {
-        400 -> message.ifBlank { "Invalid input or parameters." }
-        401 -> "Incorrect email or password, or session expired. Please sign in again."
-        403 -> "You don't have permission to perform this action."
-        404 -> "The requested record was not found on Azure."
-        409 -> message.ifBlank { "A conflict occurred (such as a conflicting booking date or duplicate email)." }
-        else -> message.ifBlank { "Azure server error ($statusCode). Please try again." }
+    is AzureApiException -> {
+        val cleanMsg = message.takeIf {
+            it.isNotBlank() && !it.startsWith("Azure API returned error") && !it.startsWith("Azure server returned error")
+        }
+        when (statusCode) {
+            400 -> cleanMsg ?: "Invalid input or account already exists. Please verify your details."
+            401 -> cleanMsg ?: "Incorrect email or password, or session expired. Please sign in again."
+            403 -> cleanMsg ?: "You don't have permission to perform this action."
+            404 -> cleanMsg ?: "The requested record was not found on Azure."
+            409 -> cleanMsg ?: "A conflict occurred (such as a conflicting booking date or duplicate email)."
+            else -> cleanMsg ?: "Azure server error ($statusCode). Please try again."
+        }
     }
     else -> message?.takeIf { it.isNotBlank() } ?: "An unexpected error occurred. Please try again."
 }

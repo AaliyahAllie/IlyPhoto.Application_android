@@ -63,7 +63,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
 
         dateOfBirthInput?.setOnClickListener(openDatePicker)
 
-        // 3. Password Validation & Strength Standard
+        // 3. Password Validation & High-Contrast Strength Indicator
         fun evaluatePasswordStrength(password: String): Int {
             if (password.isEmpty()) return 0
             var score = 0
@@ -84,19 +84,19 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 when {
                     pass.isEmpty() -> {
                         tvPasswordStrength?.text = getString(R.string.password_weak)
-                        tvPasswordStrength?.setTextColor(Color.parseColor("#FFE082"))
+                        tvPasswordStrength?.setTextColor(Color.parseColor("#FFF59D"))
                     }
                     score <= 2 -> {
-                        tvPasswordStrength?.text = "Weak: Need 8+ characters, mixed case, numbers & symbols"
-                        tvPasswordStrength?.setTextColor(Color.parseColor("#EF5350"))
+                        tvPasswordStrength?.text = "Weak: Use 8+ chars with uppercase, numbers & symbols"
+                        tvPasswordStrength?.setTextColor(Color.parseColor("#FFCDD2"))
                     }
                     score in 3..4 -> {
-                        tvPasswordStrength?.text = "Moderate: Add missing uppercase, number, or special character"
-                        tvPasswordStrength?.setTextColor(Color.parseColor("#FFA726"))
+                        tvPasswordStrength?.text = "Moderate: Add missing uppercase, number, or symbol"
+                        tvPasswordStrength?.setTextColor(Color.parseColor("#FFE082"))
                     }
                     else -> {
                         tvPasswordStrength?.text = "Strong Password ✓ (Meets security standards)"
-                        tvPasswordStrength?.setTextColor(Color.parseColor("#66BB6A"))
+                        tvPasswordStrength?.setTextColor(Color.parseColor("#C8E6C9"))
                     }
                 }
             }
@@ -157,7 +157,11 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                     Toast.makeText(requireContext(), "Welcome to Ily Photo, $fullName!", Toast.LENGTH_LONG).show()
                     findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
                 }.onFailure { err ->
-                    Toast.makeText(requireContext(), err.toUserMessage(), Toast.LENGTH_LONG).show()
+                    val userMsg = err.toUserMessage()
+                    Toast.makeText(requireContext(), userMsg, Toast.LENGTH_LONG).show()
+                    if (userMsg.contains("already exists", ignoreCase = true)) {
+                        findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
+                    }
                 }
             }
         }

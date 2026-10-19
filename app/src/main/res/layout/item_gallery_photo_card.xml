@@ -7,7 +7,7 @@
     android:layout_marginBottom="16dp"
     app:cardCornerRadius="12dp"
     app:cardElevation="3dp"
-    app:cardBackgroundColor="@color/white">
+    app:cardBackgroundColor="@color/brand_card_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -34,14 +34,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|end"
                 android:layout_margin="12dp"
-                android:background="#B31A1A1A"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
+                android:background="#CC1A1A1A"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
                 android:text="📁 AZURE CLOUD"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
         </FrameLayout>
 
@@ -57,8 +57,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="HIGH RESOLUTION PHOTO"
-                android:textColor="#7A6B5D"
-                android:textSize="11sp"
+                android:textColor="@color/brand_lilac_dark"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.05" />
 
@@ -67,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Photo Title"
-                android:textColor="#1A1A1A"
+                android:textColor="@color/brand_text_dark"
                 android:textSize="17sp"
                 android:textStyle="bold"
                 android:layout_marginTop="4dp" />
@@ -77,14 +77,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Professionally color-graded photo from your client collection."
-                android:textColor="#666666"
-                android:textSize="12sp"
+                android:textColor="@color/brand_text_muted"
+                android:textSize="13sp"
                 android:layout_marginTop="4dp" />
 
             <!-- Action buttons -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="38dp"
+                android:layout_height="42dp"
                 android:orientation="horizontal"
                 android:layout_marginTop="14dp">
 
@@ -97,7 +97,7 @@
                     android:gravity="center"
                     android:text="👁️ VIEW PHOTO"
                     android:textColor="#FFFFFF"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:textStyle="bold"
                     android:clickable="true"
                     android:focusable="true" />
@@ -110,8 +110,8 @@
                     android:background="@drawable/input_grey_background"
                     android:gravity="center"
                     android:text="⬇️ SAVE TO PHONE"
-                    android:textColor="#1A1A1A"
-                    android:textSize="12sp"
+                    android:textColor="@color/brand_text_dark"
+                    android:textSize="13sp"
                     android:textStyle="bold"
                     android:layout_marginStart="10dp"
                     android:clickable="true"
