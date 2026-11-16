@@ -27,11 +27,11 @@ object AzureConfig {
      * Base URL for the Azure App Service REST API.
      *
      * In production, points to the deployed Azure App Service:
-     *   "https://ilyphoto-api-st10212542.azurewebsites.net/api"
+     *   "https://ilyphotoweb20261116121512-bhc6cxfad6ghb8ar.southafricanorth-01.azurewebsites.net/api"
      * For local development with an Android emulator:
      *   "http://10.0.2.2:5000/api"
      */
-    var API_BASE_URL: String = "https://ilyphoto-api-st10212542.azurewebsites.net/api"
+    var API_BASE_URL: String = "https://ilyphotoweb20261116121512-bhc6cxfad6ghb8ar.southafricanorth-01.azurewebsites.net/api"
 
     // Azure Storage Account & Blob Storage settings
     const val STORAGE_ACCOUNT_NAME = "ilyphotostorage"
