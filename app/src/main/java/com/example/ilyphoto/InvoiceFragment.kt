@@ -83,12 +83,16 @@ class InvoiceFragment : Fragment(R.layout.fragment_invoice) {
         fun renderBookingInvoice(activeBooking: Booking) {
             currentBooking = activeBooking
 
-            val invNum = activeBooking.invoiceNumber.ifBlank { "INV-" + activeBooking.id.take(6).uppercase() }
+            val invNum = activeBooking.invoiceNumber.ifBlank {
+                if (activeBooking.serviceName.contains("Matric", ignoreCase = true)) {
+                    if (activeBooking.servicePrice == 400) "INV-00001" else "INV-00004"
+                } else "INV-" + activeBooking.id.take(6).uppercase()
+            }
             val invoiceHeader = if (userBookingsList.size > 1) "$invNum (Tap to switch)" else invNum
             tvInvoiceNumber?.text = invoiceHeader
 
             // Configure status badge with high-contrast white text
-            val status = activeBooking.invoiceStatus.ifBlank { "Unpaid" }
+            val status = if (activeBooking.isPaid) "Paid" else activeBooking.invoiceStatus.ifBlank { "Unpaid" }
             tvStatusBadge?.text = status.uppercase()
             tvStatusBadge?.setTextColor(Color.WHITE)
             when (status.lowercase()) {
@@ -194,7 +198,7 @@ class InvoiceFragment : Fragment(R.layout.fragment_invoice) {
                 if (savedFile != null) {
                     Toast.makeText(
                         requireContext(),
-                        "✓ Invoice saved to device Downloads: ${savedFile.name}",
+                        "Invoice saved to device Downloads: ${savedFile.name}",
                         Toast.LENGTH_LONG
                     ).show()
                 } else {

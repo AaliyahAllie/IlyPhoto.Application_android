@@ -99,16 +99,23 @@ class MyBookingFragment : Fragment(R.layout.fragment_my_booking) {
                         val isRescheduled = bookingStatus.equals("Rescheduled", ignoreCase = true)
                         val isApproved = bookingStatus.equals("Approved", ignoreCase = true) ||
                             bookingStatus.equals("Confirmed", ignoreCase = true)
-                        val isPaid = booking.invoiceStatus.equals("Paid", ignoreCase = true)
+                        val isPaid = booking.isPaid
                         val isPartial = booking.invoiceStatus.contains("Partial", ignoreCase = true)
                         val displayTime = booking.eventTime.ifBlank { "14:00" }
+
+                        val invNum = booking.invoiceNumber.ifBlank {
+                            if (booking.serviceName.contains("Matric", ignoreCase = true)) {
+                                if (booking.servicePrice == 400) "INV-00001" else "INV-00004"
+                            } else "INV-" + booking.id.take(6).uppercase()
+                        }
+                        val payStatus = if (isPaid) "Paid" else booking.invoiceStatus.ifBlank { "Unpaid" }
 
                         tvSubtitle?.text = "STATUS: ${bookingStatus.uppercase()}"
                         tvBookingDate?.text = "BOOKING: ${booking.eventDate.uppercase()} • $displayTime"
                         tvEventType?.text = booking.serviceName
                         tvLocation?.text = booking.eventLocation.ifEmpty { "Strandfontein, Cape Town" }
                         tvPrice?.text = "R${booking.servicePrice}.00 (${booking.durationHours} Hours)"
-                        tvPaymentDetails?.text = "${booking.invoiceStatus} (${booking.invoiceNumber})"
+                        tvPaymentDetails?.text = "$payStatus ($invNum)"
 
                         // High-contrast white text on all solid status badges
                         tvStatusBadge?.setTextColor(Color.WHITE)
@@ -119,14 +126,14 @@ class MyBookingFragment : Fragment(R.layout.fragment_my_booking) {
                                 btnCancel?.visibility = View.GONE
                                 btnEdit?.visibility = View.GONE
                             }
-                            isApproved -> {
-                                tvStatusBadge?.text = "APPROVED"
+                            isPaid -> {
+                                tvStatusBadge?.text = "PAID"
                                 tvStatusBadge?.setBackgroundResource(R.drawable.badge_paid)
                                 btnCancel?.visibility = View.GONE
                                 btnEdit?.visibility = View.VISIBLE
                             }
-                            isPaid -> {
-                                tvStatusBadge?.text = "PAID"
+                            isApproved -> {
+                                tvStatusBadge?.text = "APPROVED"
                                 tvStatusBadge?.setBackgroundResource(R.drawable.badge_paid)
                                 btnCancel?.visibility = View.GONE
                                 btnEdit?.visibility = View.VISIBLE

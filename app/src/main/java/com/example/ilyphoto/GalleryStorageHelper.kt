@@ -92,7 +92,7 @@ object GalleryStorageHelper {
         if (count > 0) {
             IlyNotificationHelper.showNotification(
                 context,
-                "Gallery Download Complete ✓",
+                "Gallery Download Complete",
                 "Successfully saved $count high-resolution photos to Pictures/IlyPhoto on your device."
             )
         }

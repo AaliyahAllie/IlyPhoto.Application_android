@@ -234,7 +234,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="📅 Friday, 04 September 2026"
+                                android:text="Friday, 04 September 2026"
                                 android:textColor="@color/brand_text_dark"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -283,7 +283,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="⏰ 14:00 (02:00 PM)"
+                                android:text="14:00 (02:00 PM)"
                                 android:textColor="@color/brand_text_dark"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -307,7 +307,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/badge_countdown"
-                            android:text="✓ Photographer Available on this Date"
+                            android:text="Photographer Available on this Date"
                             android:textColor="@color/brand_text_dark"
                             android:textSize="13sp"
                             android:textStyle="bold"

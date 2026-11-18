@@ -162,12 +162,13 @@
                 android:paddingBottom="32dp"
                 android:visibility="gone">
 
-                <TextView
-                    android:id="@+id/tvEmptyCameraEmoji"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="📷"
-                    android:textSize="48sp"
+                <ImageView
+                    android:id="@+id/ivEmptyGalleryIcon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_image_placeholder"
+                    android:contentDescription="Gallery Empty"
+                    app:tint="@color/brand_lilac_dark"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -183,7 +184,7 @@
                     android:layout_marginTop="14dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvEmptyCameraEmoji" />
+                    app:layout_constraintTop_toBottomOf="@id/ivEmptyGalleryIcon" />
 
                 <TextView
                     android:id="@+id/tvEmptyGalleryDesc"
@@ -218,6 +219,80 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvEmptyGalleryDesc"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Payment Required / Locked Gallery Card -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cardPaymentRequired"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/home_card_background"
+                android:elevation="4dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingTop="32dp"
+                android:paddingBottom="32dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/ivPaymentLockIcon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_settings"
+                    android:contentDescription="Gallery Locked"
+                    app:tint="@color/brand_logout_red"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvPaymentLockedTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gallery Locked - Payment Required"
+                    android:textColor="@color/brand_text_dark"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="14dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ivPaymentLockIcon" />
+
+                <TextView
+                    android:id="@+id/tvPaymentLockedDesc"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Your photoshoot gallery has been uploaded, but access is locked until the invoice has been settled in the database. Please make payment and ensure your invoice status is Paid to unlock full-resolution viewing and downloads."
+                    android:textColor="@color/brand_text_muted"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:lineSpacingExtra="3dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvPaymentLockedTitle" />
+
+                <TextView
+                    android:id="@+id/btnViewInvoice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:background="@drawable/login_button_background"
+                    android:elevation="2dp"
+                    android:gravity="center"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:text="VIEW INVOICE &amp; PAYMENT DETAILS"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="18dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvPaymentLockedDesc"
                     app:layout_constraintBottom_toBottomOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

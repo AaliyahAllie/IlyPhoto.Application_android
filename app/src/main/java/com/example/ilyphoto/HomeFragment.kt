@@ -126,8 +126,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
                         // Date & Location
                         val timeStr = booking.eventTime.ifBlank { "14:00" }
-                        tvUpcomingDateTime?.text = "📅 ${booking.eventDate} • $timeStr"
-                        tvUpcomingLocation?.text = "📍 ${booking.eventLocation.ifBlank { "Strandfontein, Cape Town" }}"
+                        tvUpcomingDateTime?.text = "${booking.eventDate} • $timeStr"
+                        tvUpcomingLocation?.text = booking.eventLocation.ifBlank { "Strandfontein, Cape Town" }
 
                         // Live Countdown calculation
                         tvUpcomingCountdown?.text = calculateCountdown(booking.eventDate, timeStr)
@@ -185,7 +185,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             } catch (_: Exception) {}
         }
         if (parsedDate == null) {
-            return "⏳ Scheduled on $dateStr"
+            return "Scheduled on $dateStr"
         }
 
         val cal = Calendar.getInstance().apply {
@@ -209,14 +209,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 val days = TimeUnit.MILLISECONDS.toDays(diff)
                 val hours = TimeUnit.MILLISECONDS.toHours(diff) % 24
                 when {
-                    days > 1 -> "⏳ $days days remaining"
-                    days == 1L -> "⏳ 1 day ($hours hrs remaining) • Tomorrow!"
-                    hours > 0 -> "⏳ $hours hrs remaining • Today!"
-                    else -> "🎉 Photo session is TODAY!"
+                    days > 1 -> "$days days remaining"
+                    days == 1L -> "1 day ($hours hrs remaining) • Tomorrow"
+                    hours > 0 -> "$hours hrs remaining • Today"
+                    else -> "Photo session is TODAY"
                 }
             }
-            diff > -86400000L -> "🎉 Photo session is TODAY!"
-            else -> "✓ Event Completed"
+            diff > -86400000L -> "Photo session is TODAY"
+            else -> "Event Completed"
         }
     }
 }

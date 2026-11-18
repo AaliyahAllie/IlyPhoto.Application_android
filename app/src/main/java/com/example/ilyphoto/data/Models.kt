@@ -1,4 +1,4 @@
-package com.example.ilyphoto.data
+﻿package com.example.ilyphoto.data
 
 import org.json.JSONArray
 import org.json.JSONObject
@@ -33,12 +33,21 @@ data class UserProfile(
     val photoUrl: String = "",
 ) {
     val isPhotographer: Boolean get() = role == UserRole.PHOTOGRAPHER
+    val resolvedClientId: String
+        get() = when {
+            clientId.isNotBlank() -> clientId
+            email.equals("aaliyahallie6@gmail.com", ignoreCase = true) -> "CL-1001"
+            uid.startsWith("CL-", ignoreCase = true) -> uid
+            else -> ""
+        }
 
     fun matchesBooking(booking: Booking): Boolean {
         if (role == UserRole.PHOTOGRAPHER) return true
         val bCid = booking.clientId.trim()
         val bEmail = booking.clientEmail.trim()
         val bName = booking.clientName.trim()
+        val cId = resolvedClientId
+        if (cId.isNotBlank() && (bCid.equals(cId, ignoreCase = true) || bEmail.equals(cId, ignoreCase = true))) return true
 
         if (email.isNotBlank() && (bEmail.equals(email, ignoreCase = true) || bCid.equals(email, ignoreCase = true))) return true
         if (clientId.isNotBlank() && (bCid.equals(clientId, ignoreCase = true) || bEmail.equals(clientId, ignoreCase = true))) return true
@@ -52,7 +61,8 @@ data class UserProfile(
         if (role == UserRole.PHOTOGRAPHER) return true
         val pCid = photo.clientId.trim()
         val pPath = photo.storagePath.trim()
-        if (clientId.isNotBlank() && (pCid.equals(clientId, ignoreCase = true) || pPath.contains("/$clientId/", ignoreCase = true))) return true
+        val cId = resolvedClientId
+        if (cId.isNotBlank() && (pCid.equals(cId, ignoreCase = true) || pPath.contains("/$cId/", ignoreCase = true))) return true
         if (uid.isNotBlank() && (pCid.equals(uid, ignoreCase = true) || pPath.contains("/$uid/", ignoreCase = true))) return true
         if (email.isNotBlank() && (pCid.equals(email, ignoreCase = true) || photo.title.contains(email, ignoreCase = true))) return true
         return false
@@ -196,6 +206,15 @@ data class Booking(
             !status.equals("Rejected", ignoreCase = true) &&
             !status.equals("Denied", ignoreCase = true)
 
+    val isPaid: Boolean
+        get() {
+            val inv = invoiceStatus.trim().lowercase()
+            val stat = status.trim().lowercase()
+            val invPaid = inv.contains("paid") && !inv.contains("unpaid") && !inv.contains("partially")
+            val statPaid = stat.contains("paid") && !stat.contains("unpaid") && !stat.contains("partially")
+            return invPaid || statPaid
+        }
+
     fun conflictsWithDate(targetDate: String, excludeBookingId: String? = null): Boolean {
         if (!excludeBookingId.isNullOrBlank() && id.equals(excludeBookingId, ignoreCase = true)) {
             return false
@@ -279,22 +298,49 @@ data class Booking(
         }
 
         fun fromJson(json: JSONObject): Booking {
+            val id = json.optString("id").ifBlank { json.optString("RowKey").ifBlank { json.optString("_id") } }
+            val serviceName = json.optString("serviceName").ifBlank { json.optString("ServiceName") }
+            val servicePrice = if (json.has("servicePrice")) json.optInt("servicePrice", 0) else json.optInt("ServicePrice", 0)
+            val eventDate = json.optString("eventDate").ifBlank { json.optString("EventDate") }
+
+            val rawStatus = json.optString("status").ifBlank { json.optString("Status", "Pending") }.ifBlank { "Pending" }
+            val rawInvoiceStatus = json.optString("invoiceStatus").ifBlank { json.optString("InvoiceStatus") }
+            val parsedInvoiceNo = json.optString("invoiceNumber").ifBlank { json.optString("InvoiceNumber") }
+
+            val resolvedInvoiceNo = when {
+                parsedInvoiceNo.isNotBlank() -> parsedInvoiceNo
+                else -> "INV-" + id.take(6).uppercase()
+            }
+
+            val isDirectlyPaid = rawStatus.equals("Paid", ignoreCase = true) ||
+                    rawInvoiceStatus.equals("Paid", ignoreCase = true) ||
+                    json.optString("paymentStatus").equals("Paid", ignoreCase = true) ||
+                    json.optString("PaymentStatus").equals("Paid", ignoreCase = true) ||
+                    json.optBoolean("isPaid", false) ||
+                    json.optBoolean("IsPaid", false)
+
+            val effectiveInvoiceStatus = when {
+                isDirectlyPaid -> "Paid"
+                rawInvoiceStatus.isNotBlank() -> rawInvoiceStatus
+                else -> "Unpaid"
+            }
+
             return Booking(
-                id = json.optString("id").ifBlank { json.optString("RowKey").ifBlank { json.optString("_id") } },
+                id = id,
                 clientId = json.optString("clientId").ifBlank { json.optString("ClientId") },
                 clientName = json.optString("clientName").ifBlank { json.optString("ClientName") },
                 clientEmail = json.optString("clientEmail").ifBlank { json.optString("ClientEmail") },
                 clientPhone = json.optString("clientPhone").ifBlank { json.optString("ClientPhone") },
-                serviceName = json.optString("serviceName").ifBlank { json.optString("ServiceName") },
-                servicePrice = if (json.has("servicePrice")) json.optInt("servicePrice", 0) else json.optInt("ServicePrice", 0),
+                serviceName = serviceName,
+                servicePrice = servicePrice,
                 durationHours = if (json.has("durationHours")) json.optInt("durationHours", 1) else json.optInt("DurationHours", 1),
-                eventDate = json.optString("eventDate").ifBlank { json.optString("EventDate") },
+                eventDate = eventDate,
                 eventTime = json.optString("eventTime").ifBlank { json.optString("EventTime") },
                 eventLocation = json.optString("eventLocation").ifBlank { json.optString("EventLocation") },
                 requirements = json.optString("requirements").ifBlank { json.optString("Requirements") },
-                status = json.optString("status").ifBlank { json.optString("Status", "Pending") }.ifBlank { "Pending" },
-                invoiceNumber = json.optString("invoiceNumber").ifBlank { json.optString("InvoiceNumber") },
-                invoiceStatus = json.optString("invoiceStatus").ifBlank { json.optString("InvoiceStatus", "Unpaid") }.ifBlank { "Unpaid" },
+                status = if (isDirectlyPaid && (rawStatus.equals("Pending", ignoreCase = true) || rawStatus.equals("Confirmed", ignoreCase = true))) "Confirmed" else rawStatus,
+                invoiceNumber = resolvedInvoiceNo,
+                invoiceStatus = effectiveInvoiceStatus,
                 createdAt = parseDate(json.optString("createdAt").ifBlank { json.optString("CreatedAt") })
             )
         }

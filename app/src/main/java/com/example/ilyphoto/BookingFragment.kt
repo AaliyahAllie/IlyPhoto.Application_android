@@ -133,14 +133,14 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
             tvCalendarYear?.text = yearFormat.format(selectedCalendar.time)
             val fullDateStr = fullDateFormat.format(selectedCalendar.time)
             tvCalendarSelectedDate?.text = fullDateStr
-            tvChosenDate?.text = "📅 $fullDateStr"
+            tvChosenDate?.text = fullDateStr
 
             val time24 = timeFormat.format(selectedCalendar.time)
             val timeAmPm = timeAmPmFormat.format(selectedCalendar.time)
-            tvChosenTime?.text = "⏰ $time24 ($timeAmPm)"
+            tvChosenTime?.text = "$time24 ($timeAmPm)"
 
             val eventDateKey = SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH).format(selectedCalendar.time)
-            tvDateAvailability?.text = "⏳ Checking live Azure schedule..."
+            tvDateAvailability?.text = "Checking live Azure schedule..."
             tvDateAvailability?.setBackgroundResource(R.drawable.badge_countdown)
             tvDateAvailability?.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_text_dark))
 
@@ -153,11 +153,11 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
                 }.getOrDefault(true)
 
                 if (!isAvailable) {
-                    tvDateAvailability?.text = "⚠️ Date Already Booked — Please Select Another Date"
+                    tvDateAvailability?.text = "Date Already Booked - Please Select Another Date"
                     tvDateAvailability?.setBackgroundResource(R.drawable.badge_pending)
                     tvDateAvailability?.setTextColor(Color.WHITE)
                 } else {
-                    tvDateAvailability?.text = "✓ Photographer Available on this Date"
+                    tvDateAvailability?.text = "Photographer Available on this Date"
                     tvDateAvailability?.setBackgroundResource(R.drawable.badge_countdown)
                     tvDateAvailability?.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_text_dark))
                 }

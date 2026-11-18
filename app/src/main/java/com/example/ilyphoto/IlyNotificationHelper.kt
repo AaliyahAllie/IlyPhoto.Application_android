@@ -137,7 +137,7 @@ object IlyNotificationHelper {
     }
 
     fun notifyPushEnabled(context: Context) {
-        val title = "Notifications Enabled ✓"
+        val title = "Notifications Enabled"
         val msg =
             "You will now receive instant push alerts for photoshoot booking updates, reminders, and gallery uploads."
         showNotification(context, title, msg, 100)

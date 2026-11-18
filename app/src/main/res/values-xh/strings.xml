@@ -84,8 +84,8 @@
     <string name="password_hint">Iphasiwedi (ubuncinane amagama angama-8)</string>
     <string name="password_weak">Ibuthathaka: Ifuna amagama asi-8+, amakhulu, amancinci, inombolo nophawu</string>
     <string name="password_moderate">Iphakathi: Uphantse wayigqiba! Faka uphawu olushiyekileyo</string>
-    <string name="password_strong">Iphasiwedi Yomelele ✓</string>
-    <string name="cape_town_disclaimer">📍 Qaphela: Umfoti usebenza eKapa nakwimimandla engqongileyo kuphela.</string>
+    <string name="password_strong">Iphasiwedi Yomelele</string>
+    <string name="cape_town_disclaimer">Qaphela: Umfoti usebenza eKapa nakwimimandla engqongileyo kuphela.</string>
     <string name="sign_up">Bhalisa</string>
     <string name="login">Ngena</string>
     <string name="register">Bhalisa</string>

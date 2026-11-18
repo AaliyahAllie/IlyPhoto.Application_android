@@ -84,8 +84,8 @@
     <string name="password_hint">Wagwoord (min 8 karakters)</string>
     <string name="password_weak">Swak: Benodig 8+ karakters, hoof- &amp; kleinletters, syfer &amp; simbool</string>
     <string name="password_moderate">Matig: Byna daar! Voeg ontbrekende tekens by</string>
-    <string name="password_strong">Sterk Wagwoord ✓</string>
-    <string name="cape_town_disclaimer">📍 Kennisgewing: Fotograaf werk slegs in en om Kaapstad.</string>
+    <string name="password_strong">Sterk Wagwoord</string>
+    <string name="cape_town_disclaimer">Kennisgewing: Fotograaf werk slegs in en om Kaapstad.</string>
     <string name="sign_up">Registreer</string>
     <string name="login">Teken In</string>
     <string name="register">Registreer</string>

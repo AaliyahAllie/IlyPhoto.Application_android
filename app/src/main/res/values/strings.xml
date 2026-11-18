@@ -83,8 +83,8 @@
     <string name="password_hint">Password (min 8 characters)</string>
     <string name="password_weak">Weak: Needs 8+ chars, upper, lower, number, symbol</string>
     <string name="password_moderate">Moderate: Almost there! Add missing characters</string>
-    <string name="password_strong">Strong Password ✓</string>
-    <string name="cape_town_disclaimer">📍 Note: Photographer operates in and around Cape Town (Strandfontein &amp; surrounds).</string>
+    <string name="password_strong">Strong Password</string>
+    <string name="cape_town_disclaimer">Note: Photographer operates in and around Cape Town (Strandfontein &amp; surrounds).</string>
     <string name="sign_up">Sign Up</string>
     <string name="login">Login</string>
     <string name="register">Register</string>

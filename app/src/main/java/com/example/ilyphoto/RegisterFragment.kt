@@ -95,7 +95,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                         tvPasswordStrength?.setTextColor(Color.parseColor("#FFE082"))
                     }
                     else -> {
-                        tvPasswordStrength?.text = "Strong Password ✓ (Meets security standards)"
+                        tvPasswordStrength?.text = "Strong Password (Meets security standards)"
                         tvPasswordStrength?.setTextColor(Color.parseColor("#C8E6C9"))
                     }
                 }
