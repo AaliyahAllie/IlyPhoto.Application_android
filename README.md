@@ -7,6 +7,9 @@
 
 **IlyPhoto** is a cross-platform photography booking, client gallery, invoicing, and community outreach system built for **ILY Photo Studio** (owned by **Aysha Allie**, 8 Green Way, Strandfontein, Cape Town). All platforms (Android Native App and ASP.NET Core Web Portal) connect to a unified **Microsoft Azure App Service REST API**, **Azure Table Storage**, and **Azure Blob Storage** backend.
 
+DEMO VIDEO: https://youtu.be/5Z_tQhBftAQ?si=6PkvfnWj2HOrKePD
+IF THE VIDEO GETS TAKEN DOWN BY YOUTUBE AS IT KEEPS BEING REMOVED REFER TO THIS ONE: 
+https://drive.google.com/file/d/1HQ2Zq17K5VRSic03niHcKrcJM5Oyy-u8/view?usp=sharing
 ---
 
 ## 🤝 Strandfontein Community & NGO Social Impact
